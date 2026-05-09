@@ -959,6 +959,49 @@ textarea {
   width: fit-content;
 }
 
+.has-cookie-banner {
+  padding-bottom: 152px;
+}
+
+.cookie-banner {
+  position: fixed;
+  z-index: 80;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  width: min(1040px, calc(100% - 2rem));
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  border: 1px solid var(--line-dark);
+  border-top: 4px solid var(--copper);
+  border-radius: var(--radius);
+  background: rgba(7, 17, 31, 0.97);
+  color: var(--white);
+  padding: 1rem;
+  box-shadow: 0 18px 48px rgba(7, 17, 31, 0.34);
+}
+
+.cookie-banner p {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.95rem;
+}
+
+.cookie-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: flex-end;
+}
+
+.cookie-actions .button {
+  min-height: 42px;
+  padding: 0.62rem 0.85rem;
+  font-size: 0.92rem;
+}
+
 @media (min-width: 640px) {
   .section-inner {
     width: min(1140px, calc(100% - 3rem));
@@ -1121,6 +1164,30 @@ textarea {
   .thank-you-section {
     align-items: start;
     padding-top: 3rem;
+  }
+
+  .has-cookie-banner {
+    padding-bottom: 310px;
+  }
+
+  .cookie-banner {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    padding: 0.9rem;
+  }
+
+  .cookie-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: stretch;
+  }
+
+  .cookie-actions .button {
+    width: 100%;
+  }
+
+  .cookie-actions a {
+    grid-column: 1 / -1;
   }
 }
 
