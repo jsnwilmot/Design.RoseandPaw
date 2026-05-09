@@ -9,11 +9,33 @@ const packageLabels = {
   growth: "Growth Package from $1,299",
   complete: "Complete Brand Package from $1,799"
 };
+const submittedStorageKey = "rosePawQuoteFormSubmitted";
 
 const trackEvent = (eventName, eventParams = {}) => {
   if (typeof window.gtag === "function") {
     window.gtag("event", eventName, eventParams);
   }
+};
+
+const markQuoteFormSubmitted = () => {
+  try {
+    window.sessionStorage.setItem(submittedStorageKey, "true");
+  } catch (error) {
+    // Storage can be unavailable in some privacy modes; the form still submits normally.
+  }
+};
+
+const clearQuoteFormSubmitted = () => {
+  try {
+    if (window.sessionStorage.getItem(submittedStorageKey) === "true") {
+      window.sessionStorage.removeItem(submittedStorageKey);
+      return true;
+    }
+  } catch (error) {
+    return false;
+  }
+
+  return false;
 };
 
 if (year) {
@@ -62,37 +84,24 @@ document.addEventListener("click", (event) => {
 });
 
 if (contactForm instanceof HTMLFormElement) {
-  const message = contactForm.querySelector("[data-form-message]");
   const params = new URLSearchParams(window.location.search);
   const packageInterest = params.get("package");
-  const budget = contactForm.elements.namedItem("budget");
+  const budget = contactForm.elements.namedItem("budget_or_package_interest");
+  const resetAfterSubmission = () => {
+    if (clearQuoteFormSubmitted()) {
+      contactForm.reset();
+    }
+  };
 
   if (packageInterest && budget instanceof HTMLSelectElement && packageLabels[packageInterest]) {
     budget.value = packageLabels[packageInterest];
   }
 
-  contactForm.addEventListener("submit", (event) => {
-    event.preventDefault();
+  resetAfterSubmission();
+  window.addEventListener("pageshow", resetAfterSubmission);
+}
 
-    if (!contactForm.checkValidity()) {
-      contactForm.reportValidity();
-      if (message) {
-        message.textContent = "Please fill in the required fields before sending.";
-      }
-      return;
-    }
-
-    const formData = new FormData(contactForm);
-    const lines = Array.from(formData.entries())
-      .map(([key, value]) => `${key}: ${value}`)
-      .join("\n");
-    const subject = encodeURIComponent("Free consultation request for Rose & Paw Digital Designs");
-    const body = encodeURIComponent(lines);
-
-    trackEvent("form_submit", { form_name: "Project inquiry" });
-    if (message) {
-      message.textContent = "Opening your email app with the project details.";
-    }
-    window.location.href = `mailto:design@roseandpaw.ca?subject=${subject}&body=${body}`;
-  });
+if (document.body && document.body.dataset.page === "thank-you") {
+  markQuoteFormSubmitted();
+  trackEvent("quote_form_submit", { form_name: "Project inquiry" });
 }

@@ -49,16 +49,20 @@
             </dl>
           </div>
 
-          <form class="quote-form" data-contact-form action="mailto:design@roseandpaw.ca" method="post" enctype="text/plain" novalidate>
+          <form action="https://api.web3forms.com/submit" method="POST" class="quote-form" data-contact-form>
+            <input type="hidden" name="access_key" value="225df1dc-443f-4d80-8162-1d63333d4bda">
+            <input type="hidden" name="redirect" value="https://design.roseandpaw.ca/thank-you.html">
+            <input type="hidden" name="subject" value="New quote request from Rose n Paw Digital Designs website">
+            <input type="hidden" name="from_name" value="Rose n Paw Digital Designs Website">
             <h2>Project inquiry</h2>
-            <p>This static form opens your email app with the details filled in after validation.</p>
+            <p>Tell us about your project and we'll follow up with the next steps.</p>
             <div class="form-grid">
               <label>Name <input name="name" autocomplete="name" required></label>
-              <label>Business name <input name="business" autocomplete="organization"></label>
+              <label>Business name <input name="business_name" autocomplete="organization"></label>
               <label>Email <input type="email" name="email" autocomplete="email" required></label>
               <label>Phone <input type="tel" name="phone" autocomplete="tel"></label>
               <label>Service needed
-                <select name="service" required>
+                <select name="service_needed" required>
                   <option value="">Select a service</option>
                   <option>Website design</option>
                   <option>SEO optimization</option>
@@ -71,7 +75,7 @@
                 </select>
               </label>
               <label>Budget or package interest
-                <select name="budget">
+                <select name="budget_or_package_interest">
                   <option value="">Not sure yet</option>
                   <option>Starter Website from $499</option>
                   <option>Launch Package from $899</option>
@@ -83,8 +87,7 @@
               </label>
             </div>
             <label>Message <textarea name="message" rows="6" required></textarea></label>
-            <p class="form-note" data-form-message aria-live="polite"></p>
-            <button class="button button-primary" type="submit" data-track="form_submit">Request a Free Consultation</button>
+            <button class="button button-primary" type="submit">Request a Free Consultation</button>
           </form>
         </div>
       </section>
