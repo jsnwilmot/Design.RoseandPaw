@@ -185,6 +185,39 @@ if (contactForm instanceof HTMLFormElement) {
 }
 
 if (document.body && document.body.dataset.page === "thank-you") {
-  markQuoteFormSubmitted();
-  trackEvent("quote_form_submit", { form_name: "Project inquiry" });
+  const params = new URLSearchParams(window.location.search);
+  const formType = params.get("type");
+  const eyebrow = document.querySelector("[data-thank-you-eyebrow]");
+  const heading = document.querySelector("[data-thank-you-heading]");
+  const body = document.querySelector("[data-thank-you-body]");
+  const note = document.querySelector("[data-thank-you-note]");
+  const copy = {
+    quote: {
+      eyebrow: "Quote request sent",
+      heading: "Thank you. Your request has been received.",
+      body: "We'll review your project details and follow up with the next steps.",
+      note: "Most quote requests receive a response within 1 to 2 business days.",
+      event: "quote_form_submit"
+    },
+    intake: {
+      eyebrow: "Client intake sent",
+      heading: "Thank you. Your form has been received.",
+      body: "We'll review your details and follow up if anything else is needed before starting your project.",
+      note: "Your intake form helps us plan your website structure, content, style direction, and project requirements.",
+      event: "client_intake_submit"
+    }
+  };
+  const activeCopy = copy[formType] || null;
+
+  if (activeCopy) {
+    if (eyebrow) eyebrow.textContent = activeCopy.eyebrow;
+    if (heading) heading.textContent = activeCopy.heading;
+    if (body) body.textContent = activeCopy.body;
+    if (note) note.textContent = activeCopy.note;
+    trackEvent(activeCopy.event, { form_name: activeCopy.eyebrow });
+  }
+
+  if (formType === "quote") {
+    markQuoteFormSubmitted();
+  }
 }
