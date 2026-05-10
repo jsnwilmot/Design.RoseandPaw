@@ -3,6 +3,9 @@ const menu = document.querySelector("[data-menu]");
 const year = document.querySelector("[data-year]");
 const header = document.querySelector("[data-header]");
 const contactForm = document.querySelector("[data-contact-form]");
+const reviewCarousel = document.querySelector("[data-review-carousel]");
+const reviewPrev = document.querySelector("[data-review-prev]");
+const reviewNext = document.querySelector("[data-review-next]");
 const packageLabels = {
   starter: "Starter Website from $499",
   launch: "Launch Package from $899",
@@ -147,6 +150,77 @@ if (header) {
 
   setHeaderState();
   window.addEventListener("scroll", setHeaderState, { passive: true });
+}
+
+if (reviewCarousel instanceof HTMLElement) {
+  const updateReviewControls = () => {
+    const maxScroll = reviewCarousel.scrollWidth - reviewCarousel.clientWidth;
+    const atStart = reviewCarousel.scrollLeft <= 2;
+    const atEnd = reviewCarousel.scrollLeft >= maxScroll - 2;
+
+    if (reviewPrev instanceof HTMLButtonElement) {
+      reviewPrev.disabled = atStart;
+    }
+
+    if (reviewNext instanceof HTMLButtonElement) {
+      reviewNext.disabled = atEnd;
+    }
+  };
+
+  const scrollReviews = (direction) => {
+    reviewCarousel.scrollBy({
+      left: reviewCarousel.clientWidth * direction,
+      behavior: "smooth"
+    });
+  };
+
+  if (reviewPrev instanceof HTMLButtonElement) {
+    reviewPrev.addEventListener("click", () => scrollReviews(-1));
+  }
+
+  if (reviewNext instanceof HTMLButtonElement) {
+    reviewNext.addEventListener("click", () => scrollReviews(1));
+  }
+
+  reviewCarousel.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      scrollReviews(-1);
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      scrollReviews(1);
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      reviewCarousel.scrollTo({ left: 0, behavior: "smooth" });
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      reviewCarousel.scrollTo({ left: reviewCarousel.scrollWidth, behavior: "smooth" });
+    }
+  });
+
+  reviewCarousel.addEventListener("wheel", (event) => {
+    const maxScroll = reviewCarousel.scrollWidth - reviewCarousel.clientWidth;
+    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+    const canScrollLeft = reviewCarousel.scrollLeft > 2;
+    const canScrollRight = reviewCarousel.scrollLeft < maxScroll - 2;
+
+    if (!delta || (delta < 0 && !canScrollLeft) || (delta > 0 && !canScrollRight)) {
+      return;
+    }
+
+    event.preventDefault();
+    reviewCarousel.scrollBy({ left: delta });
+  }, { passive: false });
+
+  reviewCarousel.addEventListener("scroll", updateReviewControls, { passive: true });
+  window.addEventListener("resize", updateReviewControls);
+  window.requestAnimationFrame(updateReviewControls);
 }
 
 document.addEventListener("click", (event) => {

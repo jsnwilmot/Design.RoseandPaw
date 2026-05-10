@@ -543,6 +543,7 @@ strong {
 .package-card,
 .package-preview article,
 .work-grid article,
+.review-card,
 .process-grid article,
 .value-list article,
 .contact-card,
@@ -555,6 +556,7 @@ strong {
 
 .service-card,
 .work-grid article,
+.review-card,
 .process-grid article {
   display: grid;
   align-content: start;
@@ -653,6 +655,172 @@ strong {
 
 .package-card .button {
   margin-top: auto;
+}
+
+.google-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.14rem;
+  margin-bottom: 1rem;
+  color: var(--bronze);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.google-label span:nth-child(1),
+.google-label span:nth-child(2) {
+  margin-right: 0.16rem;
+}
+
+.google-blue {
+  color: #4285f4;
+}
+
+.google-red {
+  color: #db4437;
+}
+
+.google-yellow {
+  color: #f4b400;
+}
+
+.google-green {
+  color: #0f9d58;
+}
+
+.review-carousel {
+  margin-top: 2rem;
+}
+
+.review-carousel-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.review-arrow {
+  width: 48px;
+  height: 48px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(184, 115, 56, 0.34);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, opacity 180ms ease;
+}
+
+.review-arrow:hover,
+.review-arrow:focus-visible {
+  border-color: var(--copper);
+  background: rgba(184, 115, 56, 0.14);
+  color: var(--bronze);
+}
+
+.review-arrow:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.review-track {
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+  margin: -0.25rem;
+  padding: 0.25rem 0.25rem 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-padding-inline: 0.25rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: rgba(184, 115, 56, 0.72) rgba(7, 17, 31, 0.12);
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.review-card {
+  flex: 0 0 100%;
+  min-height: 250px;
+  border-top: 5px solid var(--copper);
+  box-shadow: 0 18px 46px rgba(7, 17, 31, 0.08);
+  scroll-snap-align: start;
+}
+
+.review-stars {
+  color: var(--copper);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.review-placeholder-label {
+  width: fit-content;
+  border: 1px solid rgba(184, 115, 56, 0.28);
+  border-radius: var(--radius);
+  background: rgba(184, 115, 56, 0.12);
+  padding: 0.34rem 0.55rem;
+  color: var(--bronze);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.review-request-card {
+  display: grid;
+  gap: 1.25rem;
+  align-items: center;
+  margin-top: 1rem;
+  border: 1px solid rgba(184, 115, 56, 0.34);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(7, 17, 31, 0.97), rgba(23, 27, 32, 0.94)),
+    linear-gradient(90deg, rgba(184, 115, 56, 0.16), transparent);
+  padding: clamp(1.25rem, 4vw, 2rem);
+  color: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.review-request-card h3 {
+  color: var(--white);
+  font-size: 1.65rem;
+}
+
+.review-request-card p {
+  margin-top: 0.7rem;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.review-request-card .button {
+  margin-top: 1.2rem;
+}
+
+.review-qr {
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.review-qr img {
+  width: min(190px, 100%);
+  height: auto;
+  border: 8px solid var(--white);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+.review-qr figcaption {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
 }
 
 .value-list {
@@ -1117,6 +1285,14 @@ textarea {
   .checkbox-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .review-request-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .review-card {
+    flex-basis: calc((100% - 1rem) / 2);
+  }
 }
 
 @media (min-width: 1120px) {
@@ -1178,6 +1354,10 @@ textarea {
   .work-grid,
   .process-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .review-card {
+    flex-basis: calc((100% - 2rem) / 3);
   }
 
   .package-grid,
