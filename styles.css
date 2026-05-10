@@ -775,6 +775,10 @@ dd a,
   text-underline-offset: 0.24em;
 }
 
+.contact-card dd a {
+  color: var(--ink);
+}
+
 .quote-form {
   display: grid;
   gap: 1rem;

@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "optimize:images": "node tools/optimize-images.js"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
+}
