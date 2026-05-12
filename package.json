@@ -1,8 +1,13 @@
 {
   "scripts": {
+    "serve": "node tools/serve-static.js",
+    "lighthouse": "node tools/run-lighthouse.js",
+    "lighthouse:report": "node tools/run-lighthouse.js",
     "optimize:images": "node tools/optimize-images.js"
   },
   "devDependencies": {
+    "lighthouse": "^13.3.0",
+    "serve": "^14.2.6",
     "sharp": "^0.34.5"
   }
 }
