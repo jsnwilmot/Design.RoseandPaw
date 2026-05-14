@@ -1,6 +1,7 @@
 {
   "scripts": {
     "serve": "node tools/serve-static.js",
+    "check": "node tools/check-site.js",
     "lighthouse": "node tools/run-lighthouse.js",
     "lighthouse:report": "node tools/run-lighthouse.js",
     "optimize:images": "node tools/optimize-images.js"

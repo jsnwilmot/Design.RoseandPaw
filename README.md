@@ -1,12 +1,14 @@
-# Rose n Paw Digital Designs Website
+# Rose & Paw Digital Designs Website
 
-Static marketing website for Rose n Paw Digital Designs, a Canadian small business digital design service offering websites, SEO setup, business profile support, print design, and social media graphics.
+Static marketing website for Rose & Paw Digital Designs, a Lethbridge, Alberta digital design service offering small business websites, SEO setup, business profile support, print design, and social media graphics.
 
 Live site: https://design.roseandpaw.ca
 
+Last updated: May 14, 2026
+
 ## Business Summary
 
-Rose n Paw Digital Designs is based in Lethbridge, Alberta and serves small businesses across Canada. The site is built to explain services clearly, support quote requests, show portfolio work, and provide practical SEO foundations for the business.
+Rose & Paw Digital Designs is based in Lethbridge, Alberta and serves small businesses across Canada. The site is built to explain services clearly, support quote requests, show portfolio work, and provide practical SEO foundations for the business.
 
 ## Main Services
 
@@ -26,7 +28,7 @@ Rose n Paw Digital Designs is based in Lethbridge, Alberta and serves small busi
 - CSS
 - Vanilla JavaScript
 - Web3Forms for form submissions
-- Google Analytics with consent defaults
+- Google Analytics with consent defaults and deferred loading after cookie acceptance
 - GitHub Pages or equivalent static hosting
 - Optional Node.js image optimization tooling using Sharp
 
@@ -53,6 +55,7 @@ Rose n Paw Digital Designs is based in Lethbridge, Alberta and serves small busi
 |-- CNAME                   # Custom domain for GitHub Pages
 |-- images/                 # Logos, favicon, Open Graph image, portfolio assets
 |-- reports/                # Local Lighthouse reports, ignored by Git
+|-- tools/check-site.js      # Local JSON-LD, image path, and internal link checker
 |-- tools/serve-static.js    # Strict local static server for preview and Lighthouse
 `-- tools/optimize-images.js # Optional responsive image generation script
 ```
@@ -109,6 +112,14 @@ reports/lighthouse-report.html
 
 Generated reports are ignored by Git so test output does not get committed accidentally.
 
+Run the local structural checker after SEO or content edits:
+
+```bash
+npm run check
+```
+
+This validates JSON-LD syntax, local image paths, responsive source paths, and internal links.
+
 If `npm run serve` says port 3000 is already in use, stop the other local server first. Lighthouse is configured to test `http://localhost:3000` by default, so the site and Lighthouse need to use the same port.
 
 PageSpeed Insights is still the final check for the deployed site because it tests the live public URL:
@@ -133,17 +144,19 @@ When editing business name, phone number, email, or service area, update every p
 
 Main image locations:
 
-- Social sharing image: `images/og-image.png`
+- Source social sharing image: `images/og-image.png`
+- Optimized social sharing image used in meta tags: `images/og-image.jpg`
+- Google review QR image: `images/DigitalDesignsReviewQR.png` with `images/DigitalDesignsReviewQR.webp` served first on the homepage
 - Favicon and touch icon: `images/favicon-192.png`
 - Logo assets: `images/rose-and-paw-logo-*.png` and `images/rose-and-paw-logo-*.webp`
 - Portfolio images: `images/PortfolioImages/`
 
-If replacing `images/og-image.png`, keep it:
+If replacing the Open Graph image, keep it:
 
-- PNG or JPG
-- At least 1200 px wide
-- Close to a 1.91:1 sharing ratio when possible
-- Under 2 MB if practical
+- JPG around 1200 x 630 when possible
+- Around 75 to 85 percent quality, unless PNG is needed for sharp text or transparency
+- Close to a 1.91:1 sharing ratio
+- Under 2 MB, ideally much smaller
 - Branded clearly enough to work in Facebook, LinkedIn, Messages, and X/Twitter previews
 
 After replacing any image, check all HTML references, alt text, width and height attributes, and responsive `srcset` values.
@@ -206,7 +219,7 @@ For another static host, upload the project files so the HTML files, `images/`, 
 
 - Each public page has a unique title and meta description.
 - Canonical URLs use `https://design.roseandpaw.ca`.
-- Open Graph and Twitter card tags use `https://design.roseandpaw.ca/images/og-image.png`.
+- Open Graph and Twitter card tags use `https://design.roseandpaw.ca/images/og-image.jpg`.
 - `sitemap.xml` includes all public indexable pages only.
 - `robots.txt` points to the production sitemap.
 - Page content uses one clear H1.
@@ -215,6 +228,19 @@ For another static host, upload the project files so the HTML files, `images/`, 
 - Internal links use clear anchor text.
 - Structured data is present where appropriate.
 
+## Structured Data
+
+The homepage includes JSON-LD for:
+
+- `LocalBusiness` and `ProfessionalService` for Rose & Paw Digital Designs
+- `Organization`
+- `WebSite`
+- `BreadcrumbList`
+
+The business schema includes the production URL, logo, optimized image, description, email, phone, Lethbridge address locality, Alberta region, Canada service area, Facebook sameAs link, price range, service types, and an offer catalog for website design, SEO optimization, business profile setup, and print/social graphics.
+
+Do not add Review or AggregateRating schema for Rose & Paw testimonials unless there is a future compliant reason to do so.
+
 ## Performance Checklist
 
 - Use WebP images where practical.
@@ -222,9 +248,13 @@ For another static host, upload the project files so the HTML files, `images/`, 
 - Do not lazy load the main above-the-fold visual.
 - Lazy load below-the-fold images.
 - Add width and height attributes to images to reduce layout shift.
+- Use the optimized 1200 x 630 JPG Open Graph image for social sharing.
+- Serve the Google review QR code as WebP with the PNG available as fallback.
+- Use responsive WebP portfolio previews on the homepage and portfolio page.
 - Avoid unnecessary JavaScript.
 - Keep `script.js` loaded with `defer`.
 - Keep third-party scripts limited and intentional.
+- Load Google Analytics only after non-essential cookies are accepted.
 - Test mobile and desktop layouts after changes.
 - Run local Lighthouse during development with `npm run lighthouse`.
 - Run PageSpeed Insights after deployment to test the live public URL.
@@ -248,9 +278,26 @@ For another static host, upload the project files so the HTML files, `images/`, 
 - Confirm Google Analytics measurement ID before publishing major updates.
 - Re-submit the sitemap in Google Search Console after significant page or sitemap changes.
 - Test the custom 404 page after deployment.
+- Keep local SEO wording natural. Avoid awkward phrases such as repeated exact-match location keywords.
+- If more portfolio work is added, use real screenshots or clearly branded previews, not invented client work.
 
 ## Public Contact Details
 
 - Email: design@roseandpaw.ca
 - Phone: 250-588-4578
 - Facebook: https://fb.com/roseandpawdesigns
+
+## Changelog
+
+### May 14, 2026
+
+- Added and refined homepage `ProfessionalService` / `LocalBusiness` JSON-LD with service types and offers.
+- Improved local SEO wording so Lethbridge and Canada-wide service references read naturally.
+- Added homepage portfolio thumbnails using real Heidi's Hair Salon and business card assets.
+- Added Google Business Profile cleanup mockup image to the homepage LOCAL SEARCH portfolio card.
+- Optimized `images/GoogleProfileCard.png` to `images/GoogleProfileCard.webp` for the displayed homepage card image.
+- Added practical project timeline wording to the homepage process section.
+- Clarified the Lethbridge base, Vancouver Island phone-number history, and Canada-wide service area.
+- Improved image lazy loading and responsive portfolio image handling.
+- Optimized Open Graph image handling with a 1200 x 630 JPG social image.
+- Converted `DigitalDesignsReviewQR.png` to WebP for supported browsers while keeping the PNG fallback.

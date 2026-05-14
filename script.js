@@ -12,8 +12,10 @@ const packageLabels = {
   growth: "Growth Package from $1,299",
   complete: "Complete Brand Package from $1,799"
 };
+const googleAnalyticsId = "G-9QEQZ3X94H";
 const submittedStorageKey = "rosePawQuoteFormSubmitted";
 const cookieConsentKey = "rosePawCookieConsent";
+let googleAnalyticsLoaded = false;
 
 const getStoredConsent = () => {
   try {
@@ -31,6 +33,22 @@ const setStoredConsent = (value) => {
   }
 };
 
+const loadGoogleAnalytics = () => {
+  if (googleAnalyticsLoaded || typeof window.gtag !== "function") {
+    return;
+  }
+
+  googleAnalyticsLoaded = true;
+
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`;
+  document.head.append(script);
+
+  window.gtag("js", new Date());
+  window.gtag("config", googleAnalyticsId);
+};
+
 const updateGoogleConsent = (value) => {
   if (typeof window.gtag !== "function") {
     return;
@@ -44,6 +62,10 @@ const updateGoogleConsent = (value) => {
     "ad_user_data": consentValue,
     "ad_personalization": consentValue
   });
+
+  if (value === "accepted") {
+    loadGoogleAnalytics();
+  }
 };
 
 const analyticsAllowed = () => getStoredConsent() === "accepted";

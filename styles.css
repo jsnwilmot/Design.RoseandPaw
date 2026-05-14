@@ -323,7 +323,7 @@ strong {
 
 .eyebrow {
   margin-bottom: 1rem;
-  color: var(--copper);
+  color: var(--bronze);
   font-size: 0.78rem;
   font-weight: 900;
   letter-spacing: 0;
@@ -805,18 +805,26 @@ strong {
   display: grid;
   justify-items: center;
   gap: 0.65rem;
+  width: min(240px, 100%);
   margin: 0;
+}
+
+.review-qr picture {
+  display: block;
+  justify-self: center;
 }
 
 .review-qr img {
   width: min(190px, 100%);
   height: auto;
+  margin-inline: auto;
   border: 8px solid var(--white);
   border-radius: var(--radius);
   background: var(--white);
 }
 
 .review-qr figcaption {
+  width: 100%;
   color: rgba(255, 255, 255, 0.78);
   font-size: 0.9rem;
   font-weight: 800;
@@ -850,6 +858,7 @@ strong {
 
 .portfolio-preview {
   position: relative;
+  aspect-ratio: 3 / 2;
   min-height: 230px;
   margin: -1.25rem -1.25rem 0;
   overflow: hidden;
@@ -869,8 +878,24 @@ strong {
 .portfolio-preview img {
   width: 100%;
   height: 100%;
-  min-height: 230px;
   object-fit: cover;
+}
+
+.portfolio-preview picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.portfolio-preview-compact img {
+  background: linear-gradient(135deg, rgba(252, 248, 241, 0.94), rgba(184, 115, 56, 0.16));
+  object-fit: contain;
+  padding: 0.75rem;
+}
+
+.portfolio-preview-mockup img {
+  background: linear-gradient(135deg, rgba(252, 248, 241, 0.96), rgba(216, 196, 163, 0.28));
+  object-fit: contain;
 }
 
 .portfolio-card .button {
@@ -907,6 +932,12 @@ strong {
 .contact-card,
 .quote-form {
   box-shadow: 0 18px 42px rgba(7, 17, 31, 0.08);
+}
+
+.contact-note {
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.94rem;
 }
 
 .contact-card h2,
@@ -1347,7 +1378,12 @@ textarea {
   }
 
   .review-request-card {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+  }
+
+  .review-qr {
+    justify-self: center;
   }
 
   .review-card {
