@@ -1,68 +1,191 @@
-# Rose & Paw Digital Designs Website
+# Rose & Paw Digital Design
 
-Static marketing website for Rose & Paw Digital Designs, a Lethbridge, Alberta digital design service offering small business websites, SEO setup, business profile support, print design, and social media graphics.
+Static HTML/CSS/JavaScript website for Rose & Paw Digital Design.
 
 Live site: https://design.roseandpaw.ca
 
-Last updated: May 14, 2026
+Last updated: May 15, 2026
 
-## Business Summary
+## Purpose
 
-Rose & Paw Digital Designs is based in Lethbridge, Alberta and serves small businesses across Canada. The site is built to explain services clearly, support quote requests, show portfolio work, and provide practical SEO foundations for the business.
+Rose & Paw Digital Design is based in Lethbridge, Alberta and serves small businesses across Canada. The website presents affordable small business website design as the main service, with basic SEO setup, Google and Yelp profile support, business card design, social media graphics, and related digital design support.
 
-## Main Services
-
-- Small business website design
-- Website redesigns and updates
-- Search engine optimization setup
-- Google Business Profile setup and optimization
-- Yelp Business Profile setup and optimization
-- Business card design
-- Social media graphics
-- Print-ready flyers, menus, service lists, and related design assets
-- Basic analytics and launch support
+The site should not read as a Lethbridge-only business. Lethbridge is a credibility and location detail; the service area is Canada-wide.
 
 ## Tech Stack
 
-- Static HTML
-- CSS
-- Vanilla JavaScript
+- Static HTML files at the repo root
+- CSS in `styles.css`
+- Vanilla JavaScript in `script.js`
 - Web3Forms for form submissions
-- Google Analytics with consent defaults and deferred loading after cookie acceptance
-- GitHub Pages or equivalent static hosting
-- Optional Node.js image optimization tooling using Sharp
+- Google Analytics consent handling in `script.js`
+- GitHub Pages custom domain via `CNAME`
+- Optional local Node.js tools for checking links/schema, serving locally, Lighthouse, and image optimization
 
-## Folder And File Structure
+There is no build process. Deploy the static files directly.
+
+## Current Pages
+
+Public indexable pages:
+
+- `index.html` - Homepage
+- `services.html` - Website design and supporting services
+- `packages.html` - Website packages and pricing
+- `portfolio.html` - Portfolio and sample work
+- `about.html` - Business background
+- `faq.html` - FAQ content and FAQPage structured data
+- `contact.html` - Public consultation/contact form
+- `privacy.html` - Privacy policy
+- `terms.html` - Terms and service policy
+
+Utility and non-index pages:
+
+- `404.html` - Custom page-not-found page
+- `thank-you.html` - Form confirmation page, `noindex`
+- `client-intake.html` - Private client intake form, `noindex`
+
+Hidden pages are not linked from the main navigation and are not included in `sitemap.xml`.
+
+## Forms
+
+Public form:
+
+- Page: `contact.html`
+- Purpose: quote / consultation requests
+- Action: `https://api.web3forms.com/submit`
+- Redirect: `https://design.roseandpaw.ca/thank-you.html?type=quote`
+- Required fields currently include name, email, service needed, and message.
+
+Hidden/private form:
+
+- Page: `client-intake.html`
+- Purpose: project intake after a client relationship begins
+- Action: `https://api.web3forms.com/submit`
+- Redirect: `https://design.roseandpaw.ca/thank-you.html?type=intake`
+- Not linked from main navigation
+- Not included in `sitemap.xml`
+- Disallowed in `robots.txt`
+
+Before launch or after form edits, confirm Web3Forms access keys, required fields, redirects, and thank-you behavior.
+
+## SEO Features
+
+Current SEO setup includes:
+
+- Unique title tags and meta descriptions on public pages
+- Canonical URLs using `https://design.roseandpaw.ca`
+- Open Graph metadata on public pages
+- Twitter card metadata on public pages
+- Shared Open Graph image: `https://design.roseandpaw.ca/images/og-image.png`
+- `sitemap.xml` for public indexable pages only
+- `robots.txt` with sitemap reference and specific disallow rules for hidden form/thank-you pages
+- One clear H1 per page
+- Descriptive internal links and CTA text
+- Image `alt`, `width`, and `height` attributes where practical
+
+Do not use old business name variants. The official name is:
 
 ```text
-.
-|-- index.html              # Homepage
-|-- about.html              # Business background
-|-- services.html           # Service detail page
-|-- packages.html           # Packages and pricing
-|-- portfolio.html          # Portfolio examples
-|-- faq.html                # FAQ and FAQ structured data
-|-- contact.html            # Public inquiry form
-|-- client-intake.html      # Private client intake form, noindex
-|-- thank-you.html          # Form confirmation page, noindex
-|-- privacy.html            # Privacy policy
-|-- terms.html              # Terms and service policy
-|-- 404.html                # Custom not found page
-|-- styles.css              # Site styles
-|-- script.js               # Navigation, cookie consent, analytics events, form helpers
-|-- sitemap.xml             # Public indexable URL list
-|-- robots.txt              # Crawler instructions
-|-- CNAME                   # Custom domain for GitHub Pages
-|-- images/                 # Logos, favicon, Open Graph image, portfolio assets
-|-- reports/                # Local Lighthouse reports, ignored by Git
-|-- tools/check-site.js      # Local JSON-LD, image path, and internal link checker
-|-- tools/serve-static.js    # Strict local static server for preview and Lighthouse
-`-- tools/optimize-images.js # Optional responsive image generation script
+Rose & Paw Digital Design
 ```
 
-## Preview Locally
+## Structured Data
 
-Because this is a static site, you can open `index.html` directly in a browser for a quick preview.
+Structured data is embedded as JSON-LD.
+
+Homepage `index.html` includes:
+
+- `LocalBusiness` and `ProfessionalService`
+- `Organization`
+- `WebSite`
+- `BreadcrumbList`
+
+The homepage business schema should stay accurate:
+
+- Name: `Rose & Paw Digital Design`
+- URL: `https://design.roseandpaw.ca/`
+- Phone: `250-588-4578`
+- Email: `design@roseandpaw.ca`
+- Location: Lethbridge, Alberta, Canada
+- Area served: Canada
+- Services: website design, basic SEO setup, business profile setup, business card design, social media graphics
+
+`faq.html` includes `FAQPage` structured data. The FAQ schema must match the visible FAQ questions and answers in the page HTML. When FAQ content changes, update the visible FAQ and the JSON-LD together.
+
+Do not add `Review` or `AggregateRating` schema unless the visible review markup and schema follow Google structured data rules. When unsure, keep reviews visible only and do not add review schema.
+
+## Sitemap And Robots
+
+`sitemap.xml` should include only public indexable URLs:
+
+- `https://design.roseandpaw.ca/`
+- `https://design.roseandpaw.ca/services.html`
+- `https://design.roseandpaw.ca/packages.html`
+- `https://design.roseandpaw.ca/portfolio.html`
+- `https://design.roseandpaw.ca/about.html`
+- `https://design.roseandpaw.ca/faq.html`
+- `https://design.roseandpaw.ca/contact.html`
+- `https://design.roseandpaw.ca/privacy.html`
+- `https://design.roseandpaw.ca/terms.html`
+
+Do not include `client-intake.html`, `thank-you.html`, `404.html`, test pages, drafts, local reports, or utility files.
+
+Current `robots.txt`:
+
+```text
+User-agent: *
+Disallow: /client-intake.html
+Disallow: /thank-you.html
+Allow: /
+
+Sitemap: https://design.roseandpaw.ca/sitemap.xml
+```
+
+Do not broadly block CSS, JavaScript, image folders, or other assets needed to render pages.
+
+## Performance
+
+Current local Lighthouse results for the main public pages:
+
+| Page | Performance | Accessibility | Best Practices | SEO |
+|---|---:|---:|---:|---:|
+| `/` | 99 | 100 | 100 | 100 |
+| `/services.html` | 100 | 100 | 100 | 100 |
+| `/packages.html` | 100 | 100 | 100 | 100 |
+| `/portfolio.html` | 99 | 100 | 100 | 100 |
+| `/faq.html` | 99 | 100 | 100 | 100 |
+| `/contact.html` | 100 | 100 | 100 | 100 |
+
+Performance practices:
+
+- Do not lazy-load the above-the-fold hero/brand visual.
+- Use `loading="lazy"` on below-the-fold images.
+- Use WebP images where practical.
+- Keep `images/og-image.png` at a social-friendly 1200 x 630 ratio.
+- Keep `script.js` loaded with `defer`.
+- Keep animations and JavaScript lightweight.
+- Avoid layout shift in portfolio cards, review cards, and carousel areas.
+
+Run PageSpeed Insights on the live deployed site before treating performance as final.
+
+## Accessibility
+
+Accessibility expectations:
+
+- One H1 per page
+- Logical heading order
+- Visible form labels connected to inputs
+- Buttons and links with clear text
+- Keyboard-accessible navigation and mobile menu
+- Visible focus states
+- Useful alt text for content images
+- Empty alt text for decorative repeated logo images when visible text already names the brand
+- Readable color contrast
+- No “click here” link text
+
+Run Lighthouse after accessibility-related edits and manually review forms, navigation, CTAs, and image alt text.
+
+## Local Checks
 
 Install dependencies once:
 
@@ -70,38 +193,30 @@ Install dependencies once:
 npm install
 ```
 
-For a more accurate local preview, run the local static server from the project root:
+Run the local static server:
 
 ```bash
 npm run serve
 ```
 
-Then open:
+Open:
 
 ```text
 http://localhost:3000/
 ```
 
-The local server is configured to use port 3000 for repeatable local testing. If port 3000 is already in use, it will stop with a clear message instead of silently switching to another port.
-
-## Local Lighthouse Testing
-
-Local Lighthouse testing is useful during development. Start the local server first:
+Run the structural checker:
 
 ```bash
-npm run serve
+npm run check
 ```
 
-In a second terminal, run a Lighthouse test against the local site:
+This validates JSON-LD syntax, local image paths, responsive source paths, and internal links.
+
+Run the default Lighthouse report against the homepage:
 
 ```bash
 npm run lighthouse
-```
-
-This runs the same local audit used for the HTML report. To be explicit about generating the report file, run:
-
-```bash
-npm run lighthouse:report
 ```
 
 The report is written to:
@@ -110,194 +225,81 @@ The report is written to:
 reports/lighthouse-report.html
 ```
 
-Generated reports are ignored by Git so test output does not get committed accidentally.
+Generated reports are ignored by Git.
 
-Run the local structural checker after SEO or content edits:
+## Deployment
 
-```bash
-npm run check
-```
+For GitHub Pages:
 
-This validates JSON-LD syntax, local image paths, responsive source paths, and internal links.
+1. Confirm `CNAME` contains `design.roseandpaw.ca`.
+2. Confirm public pages, `images/`, `styles.css`, `script.js`, `sitemap.xml`, `robots.txt`, `404.html`, and `CNAME` are committed.
+3. Commit the changed files.
+4. Push to the branch configured for GitHub Pages.
+5. Wait for GitHub Pages to finish deployment.
+6. Test the live homepage, services, packages, portfolio, FAQ, contact, privacy, terms, sitemap, robots, and a missing URL for the custom 404.
+7. Submit or resubmit the sitemap in Google Search Console after meaningful sitemap or page changes.
 
-If `npm run serve` says port 3000 is already in use, stop the other local server first. Lighthouse is configured to test `http://localhost:3000` by default, so the site and Lighthouse need to use the same port.
-
-PageSpeed Insights is still the final check for the deployed site because it tests the live public URL:
-
-https://pagespeed.web.dev/
-
-## Editing Common Content
-
-- Homepage copy and review content: `index.html`
-- Service details: `services.html`
-- Package names, pricing, and inclusions: `packages.html`
-- Portfolio examples: `portfolio.html`
-- Contact details and inquiry form settings: `contact.html`
-- Client intake questions: `client-intake.html`
-- Privacy and terms content: `privacy.html` and `terms.html`
-- Shared layout styles: `styles.css`
-- Navigation behavior, cookie banner, and event tracking: `script.js`
-
-When editing business name, phone number, email, or service area, update every page where that information appears, plus structured data in `index.html`.
-
-## Updating Images
+## Image Notes
 
 Main image locations:
 
-- Source social sharing image: `images/og-image.png`
-- Optimized social sharing image used in meta tags: `images/og-image.jpg`
-- Google review QR image: `images/DigitalDesignsReviewQR.png` with `images/DigitalDesignsReviewQR.webp` served first on the homepage
-- Favicon and touch icon: `images/favicon-192.png`
+- Open Graph image: `images/og-image.png`
+- Favicon / touch icon: `images/favicon-192.png`
 - Logo assets: `images/rose-and-paw-logo-*.png` and `images/rose-and-paw-logo-*.webp`
-- Portfolio images: `images/PortfolioImages/`
+- Google review QR: `images/DigitalDesignsReviewQR.png` and `images/DigitalDesignsReviewQR.webp`
+- Portfolio assets: `images/PortfolioImages/`
 
-If replacing the Open Graph image, keep it:
+After replacing images, check:
 
-- JPG around 1200 x 630 when possible
-- Around 75 to 85 percent quality, unless PNG is needed for sharp text or transparency
-- Close to a 1.91:1 sharing ratio
-- Under 2 MB, ideally much smaller
-- Branded clearly enough to work in Facebook, LinkedIn, Messages, and X/Twitter previews
+- File path references
+- `srcset` values
+- `alt` text
+- `width` and `height`
+- Lazy-loading behavior
+- Lighthouse image-delivery notes
 
-After replacing any image, check all HTML references, alt text, width and height attributes, and responsive `srcset` values.
-
-## Optional Image Optimization
-
-Install dependencies once:
-
-```bash
-npm install
-```
-
-Generate optimized responsive WebP images:
+Optional responsive WebP generation:
 
 ```bash
 npm run optimize:images
 ```
 
-Only update HTML to use generated images after confirming the output files are correct and the design still looks right.
+Only update HTML to use generated images after confirming the generated files look correct.
 
-## Updating Sitemap
+## Maintenance Rules
 
-Edit `sitemap.xml` whenever a public indexable page is added, removed, or renamed.
+Keep `README.md` current in the same change set whenever changing:
 
-Use:
+- Pages
+- Navigation
+- Forms
+- SEO metadata
+- Structured data
+- `sitemap.xml`
+- `robots.txt`
+- Images or the Open Graph image
+- Portfolio items
+- Package names, pricing, or inclusions
+- Contact details
+- Deployment behavior
 
-- Production domain: `https://design.roseandpaw.ca`
-- Clean canonical URLs
-- Current `lastmod` dates
-- Only public indexable pages
+Content maintenance notes:
 
-Do not include `404.html`, `thank-you.html`, or private/noindex pages such as `client-intake.html`.
+- Update `index.html` for homepage copy, reviews, trust points, and primary CTAs.
+- Update `services.html` when services or positioning changes.
+- Update `packages.html` when pricing, package names, or “Best for” wording changes.
+- Update `portfolio.html` when adding real portfolio items or clearly labelled sample work.
+- Update `faq.html` visible FAQ content and FAQPage JSON-LD together.
+- Update `contact.html`, `client-intake.html`, and `thank-you.html` when form behavior changes.
+- Update `privacy.html` and `terms.html` when tracking, forms, third-party services, or business policies change.
+- Update `sitemap.xml` when public indexable pages are added, removed, or renamed.
+- Update `robots.txt` only for intentional crawl rules; do not block render assets.
+- Update homepage structured data when the business name, URL, phone, email, services, service area, or social links change.
 
-## Robots.txt
-
-`robots.txt` should allow normal crawling and include the sitemap:
-
-```text
-User-agent: *
-Allow: /
-
-Sitemap: https://design.roseandpaw.ca/sitemap.xml
-```
-
-Do not block CSS, JavaScript, images, or other assets needed for rendering.
-
-## Deployment
-
-For GitHub Pages with the current custom domain setup:
-
-1. Confirm `CNAME` contains `design.roseandpaw.ca`.
-2. Commit the changed files.
-3. Push to the branch configured for GitHub Pages.
-4. Confirm GitHub Pages finishes deployment.
-5. Visit `https://design.roseandpaw.ca/` and check key pages.
-
-For another static host, upload the project files so the HTML files, `images/`, `styles.css`, `script.js`, `sitemap.xml`, `robots.txt`, and `404.html` remain at the site root.
-
-## SEO Checklist
-
-- Each public page has a unique title and meta description.
-- Canonical URLs use `https://design.roseandpaw.ca`.
-- Open Graph and Twitter card tags use `https://design.roseandpaw.ca/images/og-image.jpg`.
-- `sitemap.xml` includes all public indexable pages only.
-- `robots.txt` points to the production sitemap.
-- Page content uses one clear H1.
-- Services and service area are stated naturally.
-- Images have useful alt text.
-- Internal links use clear anchor text.
-- Structured data is present where appropriate.
-
-## Structured Data
-
-The homepage includes JSON-LD for:
-
-- `LocalBusiness` and `ProfessionalService` for Rose & Paw Digital Designs
-- `Organization`
-- `WebSite`
-- `BreadcrumbList`
-
-The business schema includes the production URL, logo, optimized image, description, email, phone, Lethbridge address locality, Alberta region, Canada service area, Facebook sameAs link, price range, service types, and an offer catalog for website design, SEO optimization, business profile setup, and print/social graphics.
-
-Do not add Review or AggregateRating schema for Rose & Paw testimonials unless there is a future compliant reason to do so.
-
-## Performance Checklist
-
-- Use WebP images where practical.
-- Keep hero and logo assets lightweight.
-- Do not lazy load the main above-the-fold visual.
-- Lazy load below-the-fold images.
-- Add width and height attributes to images to reduce layout shift.
-- Use the optimized 1200 x 630 JPG Open Graph image for social sharing.
-- Serve the Google review QR code as WebP with the PNG available as fallback.
-- Use responsive WebP portfolio previews on the homepage and portfolio page.
-- Avoid unnecessary JavaScript.
-- Keep `script.js` loaded with `defer`.
-- Keep third-party scripts limited and intentional.
-- Load Google Analytics only after non-essential cookies are accepted.
-- Test mobile and desktop layouts after changes.
-- Run local Lighthouse during development with `npm run lighthouse`.
-- Run PageSpeed Insights after deployment to test the live public URL.
-
-## Accessibility Checklist
-
-- Maintain one H1 per page.
-- Keep skip link support.
-- Use descriptive link text.
-- Keep form labels visible and connected to fields.
-- Ensure buttons and links are keyboard accessible.
-- Keep image alt text meaningful.
-- Preserve readable color contrast.
-- Check mobile navigation after script or CSS changes.
-
-## Maintenance Notes
-
-- Replace review placeholder content only with real client reviews.
-- Keep pricing, service names, and package inclusions current.
-- Confirm Web3Forms access keys and redirects before launch.
-- Confirm Google Analytics measurement ID before publishing major updates.
-- Re-submit the sitemap in Google Search Console after significant page or sitemap changes.
-- Test the custom 404 page after deployment.
-- Keep local SEO wording natural. Avoid awkward phrases such as repeated exact-match location keywords.
-- If more portfolio work is added, use real screenshots or clearly branded previews, not invented client work.
+Do not invent testimonials, client claims, ranking guarantees, fake results, or fake portfolio work. Label sample work clearly.
 
 ## Public Contact Details
 
-- Email: design@roseandpaw.ca
-- Phone: 250-588-4578
-- Facebook: https://fb.com/roseandpawdesigns
-
-## Changelog
-
-### May 14, 2026
-
-- Added and refined homepage `ProfessionalService` / `LocalBusiness` JSON-LD with service types and offers.
-- Improved local SEO wording so Lethbridge and Canada-wide service references read naturally.
-- Added homepage portfolio thumbnails using real Heidi's Hair Salon and business card assets.
-- Added Google Business Profile cleanup mockup image to the homepage LOCAL SEARCH portfolio card.
-- Optimized `images/GoogleProfileCard.png` to `images/GoogleProfileCard.webp` for the displayed homepage card image.
-- Added practical project timeline wording to the homepage process section.
-- Clarified the Lethbridge base, Vancouver Island phone-number history, and Canada-wide service area.
-- Improved image lazy loading and responsive portfolio image handling.
-- Optimized Open Graph image handling with a 1200 x 630 JPG social image.
-- Converted `DigitalDesignsReviewQR.png` to WebP for supported browsers while keeping the PNG fallback.
+- Email: `design@roseandpaw.ca`
+- Phone: `250-588-4578`
+- Facebook: `https://fb.com/roseandpawdesigns`

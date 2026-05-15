@@ -1,4 +1,6 @@
 User-agent: *
+Disallow: /client-intake.html
+Disallow: /thank-you.html
 Allow: /
 
 Sitemap: https://design.roseandpaw.ca/sitemap.xml

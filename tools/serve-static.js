@@ -15,8 +15,8 @@ const types = {
   ".xml": "application/xml; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
   ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
+  ".jpg": "image/png",
+  ".jpeg": "image/png",
   ".webp": "image/webp",
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon"
@@ -84,6 +84,6 @@ server.on("error", (error) => {
 });
 
 server.listen(port, host, () => {
-  console.log(`Serving Rose n Paw Digital Designs at http://localhost:${port}/`);
+  console.log(`Serving Rose & Paw Digital Design at http://localhost:${port}/`);
   console.log("Press Ctrl+C to stop.");
 });

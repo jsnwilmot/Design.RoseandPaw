@@ -321,6 +321,12 @@ strong {
   font-size: 1.06rem;
 }
 
+.hero-support {
+  max-width: 740px;
+  margin-top: 0.85rem;
+  font-size: 1rem;
+}
+
 .eyebrow {
   margin-bottom: 1rem;
   color: var(--bronze);
@@ -608,9 +614,9 @@ strong {
 .package-label {
   width: fit-content;
   border-radius: var(--radius);
-  background: rgba(184, 115, 56, 0.16);
+  background: rgba(184, 115, 56, 0.22);
   padding: 0.38rem 0.55rem;
-  color: var(--bronze);
+  color: var(--navy);
   font-size: 0.78rem;
   font-weight: 900;
 }
@@ -758,18 +764,6 @@ strong {
   font-size: 1.15rem;
   letter-spacing: 0.08em;
   line-height: 1;
-}
-
-.review-placeholder-label {
-  width: fit-content;
-  border: 1px solid rgba(184, 115, 56, 0.28);
-  border-radius: var(--radius);
-  background: rgba(184, 115, 56, 0.12);
-  padding: 0.34rem 0.55rem;
-  color: var(--bronze);
-  font-size: 0.76rem;
-  font-weight: 900;
-  text-transform: uppercase;
 }
 
 .review-request-card {
@@ -1463,9 +1457,12 @@ textarea {
   }
 
   .package-grid,
-  .package-preview,
-  .trust-grid {
+  .package-preview {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .trust-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .intake-card .checkbox-grid {

@@ -292,7 +292,7 @@ if (document.body && document.body.dataset.page === "thank-you") {
       eyebrow: "Quote request sent",
       heading: "Thank you. Your request has been received.",
       body: "We'll review your project details and follow up with the next steps.",
-      note: "Most quote requests receive a response within 1 to 2 business days.",
+      note: "You can return to the website or email design@roseandpaw.ca if you need to add anything.",
       event: "quote_form_submit"
     },
     intake: {
