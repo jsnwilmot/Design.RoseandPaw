@@ -1,6 +1,6 @@
-# Rose & Paw Digital Design
+# Rose & Paw Digital Designs
 
-Static HTML/CSS/JavaScript website for Rose & Paw Digital Design.
+Static HTML/CSS/JavaScript website for Rose & Paw Digital Designs.
 
 Live site: https://design.roseandpaw.ca
 
@@ -8,7 +8,7 @@ Last updated: May 15, 2026
 
 ## Purpose
 
-Rose & Paw Digital Design is based in Lethbridge, Alberta and serves small businesses across Canada. The website presents affordable small business website design as the main service, with basic SEO setup, Google and Yelp profile support, business card design, social media graphics, and related digital design support.
+Rose & Paw Digital Designs is based in Lethbridge, Alberta and serves small businesses across Canada. The website presents affordable small business website design as the main service, with basic SEO setup, Google and Yelp profile support, business card design, social media graphics, and related digital design support.
 
 The site should not read as a Lethbridge-only business. Lethbridge is a credibility and location detail; the service area is Canada-wide.
 
@@ -86,7 +86,7 @@ Current SEO setup includes:
 Do not use old business name variants. The official name is:
 
 ```text
-Rose & Paw Digital Design
+Rose & Paw Digital Designs
 ```
 
 ## Structured Data
@@ -102,7 +102,7 @@ Homepage `index.html` includes:
 
 The homepage business schema should stay accurate:
 
-- Name: `Rose & Paw Digital Design`
+- Name: `Rose & Paw Digital Designs`
 - URL: `https://design.roseandpaw.ca/`
 - Phone: `250-588-4578`
 - Email: `design@roseandpaw.ca`

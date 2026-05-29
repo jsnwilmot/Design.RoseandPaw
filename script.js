@@ -266,18 +266,185 @@ if (contactForm instanceof HTMLFormElement) {
   const params = new URLSearchParams(window.location.search);
   const packageInterest = params.get("package");
   const budget = contactForm.elements.namedItem("budget_or_package_interest");
+  const formStatus = contactForm.querySelector("[data-form-status]");
+  const submitButton = contactForm.querySelector('button[type="submit"]');
   const resetAfterSubmission = () => {
     if (clearQuoteFormSubmitted()) {
       contactForm.reset();
     }
   };
 
+  const showFormStatus = (message, type = "error") => {
+    if (!(formStatus instanceof HTMLElement)) {
+      return;
+    }
+
+    formStatus.textContent = message;
+    formStatus.dataset.status = type;
+  };
+
+  const replaceFormWithSuccess = () => {
+    contactForm.innerHTML = `
+      <div class="form-success" tabindex="-1">
+        <p class="eyebrow">Request sent</p>
+        <h2>Thank you. Your message has been received.</h2>
+        <p>I&rsquo;ll review your project details and follow up with practical next steps.</p>
+        <p>You can also email <a href="mailto:design@roseandpaw.ca">design@roseandpaw.ca</a> if you need to add anything.</p>
+      </div>
+    `;
+
+    const success = contactForm.querySelector(".form-success");
+    if (success instanceof HTMLElement) {
+      success.focus({ preventScroll: true });
+    }
+
+    trackEvent("quote_form_submit", { form_name: "Project inquiry" });
+  };
+
+  const validateRequiredContactFields = () => {
+    const requiredNames = ["name", "email", "message"];
+    const missingFields = requiredNames.filter((fieldName) => {
+      const field = contactForm.elements.namedItem(fieldName);
+      return field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement
+        ? field.value.trim() === ""
+        : true;
+    });
+
+    if (missingFields.length > 0) {
+      showFormStatus("Please fill in your name, email, and message before submitting.");
+      const firstMissingField = contactForm.elements.namedItem(missingFields[0]);
+      if (firstMissingField instanceof HTMLElement) {
+        firstMissingField.focus();
+      }
+      return false;
+    }
+
+    if (!contactForm.checkValidity()) {
+      showFormStatus("Please check the highlighted fields and try again.");
+      contactForm.reportValidity();
+      return false;
+    }
+
+    showFormStatus("");
+    return true;
+  };
+
   if (packageInterest && budget instanceof HTMLSelectElement && packageLabels[packageInterest]) {
     budget.value = packageLabels[packageInterest];
   }
 
+  contactForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!validateRequiredContactFields()) {
+      return;
+    }
+
+    const previousButtonText = submitButton instanceof HTMLButtonElement ? submitButton.textContent : "";
+
+    if (submitButton instanceof HTMLButtonElement) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending...";
+    }
+
+    try {
+      const response = await fetch(contactForm.action, {
+        method: "POST",
+        body: new FormData(contactForm),
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("The form service did not accept the request.");
+      }
+
+      replaceFormWithSuccess();
+    } catch (error) {
+      showFormStatus("Sorry, the form could not be submitted. Please email design@roseandpaw.ca or try again.");
+
+      if (submitButton instanceof HTMLButtonElement) {
+        submitButton.disabled = false;
+        submitButton.textContent = previousButtonText;
+      }
+    }
+  });
+
   resetAfterSubmission();
   window.addEventListener("pageshow", resetAfterSubmission);
+}
+
+const portfolioImages = document.querySelectorAll(".portfolio-preview img");
+
+if (portfolioImages.length > 0) {
+  const lightbox = document.createElement("div");
+  lightbox.className = "image-lightbox";
+  lightbox.setAttribute("role", "dialog");
+  lightbox.setAttribute("aria-modal", "true");
+  lightbox.setAttribute("aria-label", "Expanded portfolio image");
+  lightbox.hidden = true;
+  lightbox.innerHTML = `
+    <button class="image-lightbox-close" type="button" aria-label="Close image preview">Close</button>
+    <img alt="">
+  `;
+
+  const lightboxImage = lightbox.querySelector("img");
+  const closeButton = lightbox.querySelector("button");
+  let lastFocusedElement = null;
+
+  const closeLightbox = () => {
+    lightbox.hidden = true;
+    document.body.classList.remove("has-lightbox");
+
+    if (lastFocusedElement instanceof HTMLElement) {
+      lastFocusedElement.focus();
+    }
+  };
+
+  portfolioImages.forEach((image) => {
+    image.setAttribute("tabindex", "0");
+    image.setAttribute("role", "button");
+    image.setAttribute("aria-label", "Open larger portfolio image");
+
+    const openLightbox = () => {
+      lastFocusedElement = document.activeElement;
+
+      if (lightboxImage instanceof HTMLImageElement) {
+        lightboxImage.src = image.currentSrc || image.src;
+        lightboxImage.alt = image.alt || "Expanded portfolio image";
+      }
+
+      lightbox.hidden = false;
+      document.body.classList.add("has-lightbox");
+
+      if (closeButton instanceof HTMLButtonElement) {
+        closeButton.focus();
+      }
+    };
+
+    image.addEventListener("click", openLightbox);
+    image.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openLightbox();
+      }
+    });
+  });
+
+  lightbox.addEventListener("click", (event) => {
+    if (event.target === lightbox || event.target === closeButton) {
+      closeLightbox();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !lightbox.hidden) {
+      closeLightbox();
+    }
+  });
+
+  document.body.append(lightbox);
 }
 
 if (document.body && document.body.dataset.page === "thank-you") {
