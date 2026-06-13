@@ -24,7 +24,7 @@ if (fs.existsSync(outputPath)) {
 
 const args = [
   lighthouseCli,
-  "http://localhost:3000",
+  "http://127.0.0.1:3000",
   "--output",
   "html",
   "--output-path",

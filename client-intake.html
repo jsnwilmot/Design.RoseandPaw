@@ -52,7 +52,7 @@
     <main id="main">
       <section class="page-hero">
         <div class="section-inner narrow">
-          <p class="eyebrow">Private project form</p>
+          <p class="eyebrow">Unlisted project form</p>
           <h1>Client Website Intake Form</h1>
           <p>This form helps us collect the details needed to plan your website project. Please complete it as accurately as possible so we can prepare your content, structure, style direction, and project requirements.</p>
         </div>
@@ -60,7 +60,7 @@
 
       <section class="section section-cream">
         <div class="section-inner intake-card">
-          <form action="https://api.web3forms.com/submit" method="POST">
+          <form action="https://api.web3forms.com/submit" method="POST" data-protected-form>
             <input type="hidden" name="access_key" value="9786a91c-c3fd-4b9e-ad2d-3d55ec5807d5">
             <input type="hidden" name="subject" value="New client intake form submission">
             <input type="hidden" name="from_name" value="Rose & Paw Digital Designs Client Intake">
@@ -148,17 +148,18 @@
               <label>Anything else the website should include <small>Add final notes, concerns, features, or instructions.</small><textarea name="extra_notes" rows="5"></textarea></label>
             </fieldset>
 
+            <div class="turnstile-container" data-turnstile tabindex="-1" aria-label="Spam protection"></div>
+            <p class="form-status" data-form-status aria-live="polite"></p>
             <button class="button button-primary" type="submit">Submit Client Intake Form</button>
           </form>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer"><div class="section-inner footer-grid"><div class="footer-column footer-column-brand"><a class="footer-brand" href="index.html"><img src="images/rose-and-paw-logo-180.webp" srcset="images/rose-and-paw-logo-180.webp 180w, images/rose-and-paw-logo-360.webp 360w" sizes="42px" width="54" height="55" loading="lazy" decoding="async" alt=""><span>Rose &amp; Paw Digital Designs</span></a><p class="footer-description">Based in Lethbridge, Alberta. Originally from Vancouver Island, now serving small businesses Canada-wide.</p></div><nav class="footer-column" aria-labelledby="footer-explore-title"><h2 class="footer-heading" id="footer-explore-title">Explore</h2><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="services.html">Services</a></li><li><a href="packages.html">Packages</a></li><li><a href="portfolio.html">Portfolio</a></li></ul></nav><nav class="footer-column" aria-labelledby="footer-support-title"><h2 class="footer-heading" id="footer-support-title">Support</h2><ul class="footer-links"><li><a href="faq.html">FAQ</a></li><li><a href="contact.html">Contact</a></li><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms &amp; Service Policy</a></li></ul></nav><div class="footer-column footer-contact"><h2 class="footer-heading">Contact</h2><address class="footer-address"><a href="tel:2505884578" data-track="phone_click">Phone: 250-588-4578</a><a href="mailto:design@roseandpaw.ca" data-track="email_click">Email: design@roseandpaw.ca</a></address><a href="https://fb.com/roseandpawdesigns" target="_blank" rel="noopener noreferrer" data-track="facebook_click">Facebook</a><a class="footer-cta" href="contact.html" data-track="quote_click">Request a Quote</a></div></div><div class="section-inner footer-bottom"><p>&copy; <span data-year>2026</span> Rose &amp; Paw Digital Designs. All rights reserved.</p></div></footer>
+    <footer class="site-footer"><div class="section-inner footer-grid"><div class="footer-column footer-column-brand"><a class="footer-brand" href="index.html"><img src="images/rose-and-paw-logo-180.webp" srcset="images/rose-and-paw-logo-180.webp 180w, images/rose-and-paw-logo-360.webp 360w" sizes="42px" width="54" height="55" loading="lazy" decoding="async" alt=""><span>Rose &amp; Paw Digital Designs</span></a><p class="footer-description">Based in Lethbridge, Alberta. Originally from Vancouver Island, now serving small businesses Canada-wide.</p></div><nav class="footer-column" aria-labelledby="footer-explore-title"><h2 class="footer-heading" id="footer-explore-title">Explore</h2><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="services.html">Services</a></li><li><a href="packages.html">Packages</a></li><li><a href="portfolio.html">Portfolio</a></li></ul></nav><nav class="footer-column" aria-labelledby="footer-support-title"><h2 class="footer-heading" id="footer-support-title">Support</h2><ul class="footer-links"><li><a href="faq.html">FAQ</a></li><li><a href="contact.html">Contact</a></li><li><a href="privacy.html">Privacy Policy</a></li><li><a href="terms.html">Terms &amp; Service Policy</a></li></ul></nav><div class="footer-column footer-contact"><h2 class="footer-heading">Contact</h2><address class="footer-address"><a href="tel:2505884578" data-track="phone_click">Phone: 250-588-4578</a><a href="mailto:design@roseandpaw.ca" data-track="email_click">Email: design@roseandpaw.ca</a></address><a href="https://fb.com/roseandpawdesigns" target="_blank" rel="noopener noreferrer" data-track="facebook_click">Facebook</a><a class="footer-cta" href="contact.html" data-track="quote_click">Request a Quote</a></div></div><div class="section-inner footer-bottom"><button class="cookie-settings-button" type="button" data-cookie-settings aria-label="Open cookie settings">Cookie settings</button><p>&copy; <span data-year>2026</span> Rose &amp; Paw Digital Designs. All rights reserved.</p></div></footer>
     <script src="script.js" defer></script>
   </body>
 </html>
-
 
 
 

@@ -235,6 +235,10 @@ strong {
   transform: translateY(0);
 }
 
+.primary-menu[hidden] {
+  display: none;
+}
+
 .primary-menu a {
   min-height: 44px;
   display: inline-flex;
@@ -1257,6 +1261,25 @@ textarea {
   color: var(--white);
 }
 
+.cookie-settings-button {
+  width: fit-content;
+  border: 0;
+  background: transparent;
+  color: var(--white);
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cookie-settings-button:hover {
+  color: #efc18a;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
 .footer-cta {
   min-height: 42px;
   margin-top: 0.2rem;
@@ -1280,6 +1303,11 @@ textarea {
 .footer-bottom {
   margin-top: 1.6rem;
   padding-top: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  align-items: center;
+  justify-content: space-between;
   border-top: 1px solid rgba(184, 115, 56, 0.42);
 }
 
@@ -1315,6 +1343,15 @@ textarea {
 .cookie-banner p {
   color: rgba(255, 255, 255, 0.82);
   font-size: 0.95rem;
+}
+
+.cookie-copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.cookie-choice-status {
+  font-weight: 800;
 }
 
 .cookie-actions {
@@ -1617,6 +1654,19 @@ textarea {
 
 .form-status[data-status="error"] {
   color: #8b2d1a;
+}
+
+.form-status[data-status="info"] {
+  color: var(--muted);
+}
+
+.form-status[data-status="success"] {
+  color: #336c45;
+}
+
+.turnstile-container {
+  min-height: 65px;
+  outline: none;
 }
 
 .form-success {

@@ -4,7 +4,7 @@ Static HTML/CSS/JavaScript website for Rose & Paw Digital Designs.
 
 Live site: https://design.roseandpaw.ca
 
-Last updated: May 15, 2026
+Last updated: June 13, 2026
 
 ## Purpose
 
@@ -18,7 +18,8 @@ The site should not read as a Lethbridge-only business. Lethbridge is a credibil
 - CSS in `styles.css`
 - Vanilla JavaScript in `script.js`
 - Web3Forms for form submissions
-- Google Analytics consent handling in `script.js`
+- Google Analytics 4 consent handling in `script.js` using Measurement ID `G-9QEQZ3X94H`
+- Cloudflare Turnstile spam protection for website forms
 - GitHub Pages custom domain via `CNAME`
 - Optional local Node.js tools for checking links/schema, serving locally, Lighthouse, and image optimization
 
@@ -42,9 +43,9 @@ Utility and non-index pages:
 
 - `404.html` - Custom page-not-found page
 - `thank-you.html` - Form confirmation page, `noindex`
-- `client-intake.html` - Private client intake form, `noindex`
+- `client-intake.html` - Unlisted client intake form that is excluded from search indexing. The page is not password protected.
 
-Hidden pages are not linked from the main navigation and are not included in `sitemap.xml`.
+Utility and unlisted pages are not linked from the main navigation and are not included in `sitemap.xml`.
 
 ## Forms
 
@@ -56,7 +57,7 @@ Public form:
 - Redirect: `https://design.roseandpaw.ca/thank-you.html?type=quote`
 - Required fields currently include name, email, service needed, and message.
 
-Hidden/private form:
+Unlisted form:
 
 - Page: `client-intake.html`
 - Purpose: project intake after a client relationship begins
@@ -64,9 +65,20 @@ Hidden/private form:
 - Redirect: `https://design.roseandpaw.ca/thank-you.html?type=intake`
 - Not linked from main navigation
 - Not included in `sitemap.xml`
-- Disallowed in `robots.txt`
+- Excluded from search indexing with a `noindex` meta tag
+- Not password protected
 
-Before launch or after form edits, confirm Web3Forms access keys, required fields, redirects, and thank-you behavior.
+Both forms use Cloudflare Turnstile and remain blocked until spam verification succeeds. Before deployment, replace the documented `CONFIGURE_TURNSTILE_SITE_KEY` placeholder in `script.js` with the production Turnstile public site key for `design.roseandpaw.ca`. Never add the Turnstile secret key to this repository.
+
+Before launch or after form edits, confirm Web3Forms access keys, required fields, redirects, Turnstile behavior, and thank-you behavior.
+
+## Analytics And Cookie Preferences
+
+- Google Analytics 4 is configured with Measurement ID `G-9QEQZ3X94H`.
+- GA4 loads only after the visitor accepts analytics cookies.
+- Advertising storage, user data, and personalization consent remain denied.
+- Every page footer includes a `Cookie settings` button so visitors can review, revise, or withdraw consent.
+- Withdrawing analytics consent updates Google Consent Mode and does not inject GA4 again during the current page session.
 
 ## SEO Features
 
@@ -78,7 +90,7 @@ Current SEO setup includes:
 - Twitter card metadata on public pages
 - Shared Open Graph image: `https://design.roseandpaw.ca/images/og-image.png`
 - `sitemap.xml` for public indexable pages only
-- `robots.txt` with sitemap reference and specific disallow rules for hidden form/thank-you pages
+- `robots.txt` allows normal crawling so search engines can read `noindex` instructions and retains the sitemap reference
 - One clear H1 per page
 - Descriptive internal links and CTA text
 - Image `alt`, `width`, and `height` attributes where practical
@@ -134,8 +146,6 @@ Current `robots.txt`:
 
 ```text
 User-agent: *
-Disallow: /client-intake.html
-Disallow: /thank-you.html
 Allow: /
 
 Sitemap: https://design.roseandpaw.ca/sitemap.xml
@@ -202,7 +212,7 @@ npm run serve
 Open:
 
 ```text
-http://localhost:3000/
+http://127.0.0.1:3000/
 ```
 
 Run the structural checker:
@@ -212,6 +222,13 @@ npm run check
 ```
 
 This validates JSON-LD syntax, local image paths, responsive source paths, and internal links.
+
+Review all `target="_blank"` links, form labels, robots rules, sitemap exclusions, consent defaults, and Turnstile configuration:
+
+```bash
+rg -n -g "*.html" "target=\"_blank\"|data-protected-form|data-cookie-settings"
+rg -n "analytics_storage|ad_storage|ad_user_data|ad_personalization|CONFIGURE_TURNSTILE_SITE_KEY" script.js
+```
 
 Run the default Lighthouse report against the homepage:
 

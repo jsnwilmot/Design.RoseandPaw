@@ -13,6 +13,7 @@ const packageLabels = {
   complete: "Complete Brand Package from $1,799"
 };
 const googleAnalyticsId = "G-9QEQZ3X94H";
+const turnstileSiteKey = "CONFIGURE_TURNSTILE_SITE_KEY";
 const submittedStorageKey = "rosePawQuoteFormSubmitted";
 const cookieConsentKey = "rosePawCookieConsent";
 let googleAnalyticsLoaded = false;
@@ -54,13 +55,11 @@ const updateGoogleConsent = (value) => {
     return;
   }
 
-  const consentValue = value === "accepted" ? "granted" : "denied";
-
   window.gtag("consent", "update", {
-    "analytics_storage": consentValue,
-    "ad_storage": consentValue,
-    "ad_user_data": consentValue,
-    "ad_personalization": consentValue
+    "analytics_storage": value === "accepted" ? "granted" : "denied",
+    "ad_storage": "denied",
+    "ad_user_data": "denied",
+    "ad_personalization": "denied"
   });
 
   if (value === "accepted") {
@@ -107,8 +106,22 @@ if (storedConsent === "accepted" || storedConsent === "rejected") {
   updateGoogleConsent(storedConsent);
 }
 
-const createCookieBanner = () => {
-  if (storedConsent === "accepted" || storedConsent === "rejected") {
+const getConsentDescription = () => {
+  const consent = getStoredConsent();
+
+  if (consent === "accepted") {
+    return "Current choice: analytics cookies accepted.";
+  }
+
+  if (consent === "rejected") {
+    return "Current choice: analytics cookies rejected.";
+  }
+
+  return "No analytics cookie choice has been saved.";
+};
+
+const openCookieSettings = () => {
+  if (document.querySelector(".cookie-banner")) {
     return;
   }
 
@@ -116,53 +129,106 @@ const createCookieBanner = () => {
   banner.className = "cookie-banner";
   banner.setAttribute("aria-label", "Cookie consent");
   banner.innerHTML = `
-    <p>We use cookies to improve this website, measure traffic, and understand which services visitors are interested in. You can accept or reject non-essential cookies.</p>
+    <div class="cookie-copy">
+      <p>We use cookies to improve this website, measure traffic, and understand which services visitors are interested in. You can accept or reject non-essential cookies.</p>
+      <p class="cookie-choice-status" data-cookie-status>${getConsentDescription()}</p>
+    </div>
     <div class="cookie-actions">
-      <button class="button button-primary" type="button" data-cookie-choice="accepted">Accept</button>
-      <button class="button button-light" type="button" data-cookie-choice="rejected">Reject</button>
+      <button class="button button-primary" type="button" data-cookie-choice="accepted">Accept analytics</button>
+      <button class="button button-light" type="button" data-cookie-choice="rejected">Reject analytics</button>
       <a class="button button-secondary" href="privacy.html">Privacy Policy</a>
+      <button class="button button-secondary" type="button" data-cookie-close>Close</button>
     </div>
   `;
 
   document.body.classList.add("has-cookie-banner");
-
-  banner.addEventListener("click", (event) => {
-    const button = event.target instanceof Element ? event.target.closest("[data-cookie-choice]") : null;
-
-    if (!(button instanceof HTMLButtonElement)) {
-      return;
-    }
-
-    const choice = button.dataset.cookieChoice;
-
-    if (choice !== "accepted" && choice !== "rejected") {
-      return;
-    }
-
-    setStoredConsent(choice);
-    updateGoogleConsent(choice);
-    document.body.classList.remove("has-cookie-banner");
-    banner.remove();
-  });
-
   document.body.append(banner);
+
+  const firstChoice = banner.querySelector("[data-cookie-choice]");
+  if (firstChoice instanceof HTMLButtonElement) {
+    firstChoice.focus({ preventScroll: true });
+  }
 };
 
-createCookieBanner();
+const closeCookieSettings = () => {
+  const banner = document.querySelector(".cookie-banner");
+  document.body.classList.remove("has-cookie-banner");
+  banner?.remove();
+};
+
+document.addEventListener("click", (event) => {
+  const target = event.target instanceof Element ? event.target : null;
+
+  if (target?.closest("[data-cookie-settings]")) {
+    openCookieSettings();
+    return;
+  }
+
+  if (target?.closest("[data-cookie-close]")) {
+    closeCookieSettings();
+    return;
+  }
+
+  const choiceButton = target?.closest("[data-cookie-choice]");
+  if (!(choiceButton instanceof HTMLButtonElement)) {
+    return;
+  }
+
+  const choice = choiceButton.dataset.cookieChoice;
+  if (choice !== "accepted" && choice !== "rejected") {
+    return;
+  }
+
+  setStoredConsent(choice);
+  updateGoogleConsent(choice);
+  closeCookieSettings();
+});
+
+if (storedConsent !== "accepted" && storedConsent !== "rejected") {
+  openCookieSettings();
+}
 
 if (navToggle && menu) {
+  const desktopNavigation = window.matchMedia("(min-width: 1120px)");
+  const toggleLabel = navToggle.querySelector(".sr-only");
+
+  const setNavigationState = (isOpen, returnFocus = false) => {
+    const isDesktop = desktopNavigation.matches;
+    const mobileMenuOpen = !isDesktop && isOpen;
+
+    navToggle.setAttribute("aria-expanded", String(mobileMenuOpen));
+    menu.classList.toggle("is-open", mobileMenuOpen);
+    menu.hidden = !isDesktop && !mobileMenuOpen;
+    menu.inert = !isDesktop && !mobileMenuOpen;
+
+    if (toggleLabel) {
+      toggleLabel.textContent = mobileMenuOpen ? "Close navigation" : "Open navigation";
+    }
+
+    if (returnFocus) {
+      navToggle.focus();
+    }
+  };
+
+  setNavigationState(false);
+
   navToggle.addEventListener("click", () => {
-    const isOpen = navToggle.getAttribute("aria-expanded") === "true";
-    navToggle.setAttribute("aria-expanded", String(!isOpen));
-    menu.classList.toggle("is-open", !isOpen);
+    setNavigationState(navToggle.getAttribute("aria-expanded") !== "true");
   });
 
   menu.addEventListener("click", (event) => {
     if (event.target instanceof HTMLAnchorElement) {
-      navToggle.setAttribute("aria-expanded", "false");
-      menu.classList.remove("is-open");
+      setNavigationState(false);
     }
   });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && navToggle.getAttribute("aria-expanded") === "true") {
+      setNavigationState(false, true);
+    }
+  });
+
+  desktopNavigation.addEventListener("change", () => setNavigationState(false));
 }
 
 if (header) {
@@ -261,6 +327,135 @@ document.addEventListener("click", (event) => {
     });
   }
 });
+
+const protectedForms = document.querySelectorAll("[data-protected-form]");
+const turnstileStates = new WeakMap();
+
+const loadTurnstile = () => new Promise((resolve, reject) => {
+  if (window.turnstile) {
+    resolve(window.turnstile);
+    return;
+  }
+
+  const existingScript = document.querySelector("[data-turnstile-script]");
+  if (existingScript) {
+    existingScript.addEventListener("load", () => resolve(window.turnstile), { once: true });
+    existingScript.addEventListener("error", reject, { once: true });
+    return;
+  }
+
+  const script = document.createElement("script");
+  script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+  script.async = true;
+  script.defer = true;
+  script.dataset.turnstileScript = "";
+  script.addEventListener("load", () => resolve(window.turnstile), { once: true });
+  script.addEventListener("error", reject, { once: true });
+  document.head.append(script);
+});
+
+const setProtectedFormStatus = (form, message, type = "error") => {
+  const status = form.querySelector("[data-form-status]");
+  if (status instanceof HTMLElement) {
+    status.textContent = message;
+    status.dataset.status = type;
+  }
+};
+
+const resetTurnstile = (form) => {
+  const state = turnstileStates.get(form);
+  if (!state || !window.turnstile || state.widgetId === null) {
+    return;
+  }
+
+  state.verified = false;
+  state.submitButton.disabled = true;
+  window.turnstile.reset(state.widgetId);
+};
+
+if (protectedForms.length > 0) {
+  protectedForms.forEach((form) => {
+    if (!(form instanceof HTMLFormElement)) {
+      return;
+    }
+
+    const submitButton = form.querySelector('button[type="submit"]');
+    const container = form.querySelector("[data-turnstile]");
+    if (!(submitButton instanceof HTMLButtonElement) || !(container instanceof HTMLElement)) {
+      return;
+    }
+
+    const state = { submitButton, verified: false, widgetId: null };
+    turnstileStates.set(form, state);
+    submitButton.disabled = true;
+    setProtectedFormStatus(form, "Complete the spam protection check before submitting.", "info");
+
+    form.addEventListener("submit", (event) => {
+      if (state.verified) {
+        if (!form.hasAttribute("data-contact-form")) {
+          state.submitButton.disabled = true;
+          state.submitButton.textContent = "Submitting...";
+          setProtectedFormStatus(form, "Submitting your form.", "info");
+        }
+        return;
+      }
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setProtectedFormStatus(form, "Please complete the spam protection check before submitting.");
+      container.focus();
+    });
+  });
+
+  if (turnstileSiteKey === "CONFIGURE_TURNSTILE_SITE_KEY") {
+    protectedForms.forEach((form) => {
+      if (form instanceof HTMLFormElement) {
+        setProtectedFormStatus(form, "Spam protection is not configured. Please email design@roseandpaw.ca.");
+      }
+    });
+  } else {
+    loadTurnstile()
+      .then((turnstile) => {
+        protectedForms.forEach((form) => {
+          if (!(form instanceof HTMLFormElement)) {
+            return;
+          }
+
+          const state = turnstileStates.get(form);
+          const container = form.querySelector("[data-turnstile]");
+          if (!state || !(container instanceof HTMLElement)) {
+            return;
+          }
+
+          state.widgetId = turnstile.render(container, {
+            sitekey: turnstileSiteKey,
+            callback: () => {
+              state.verified = true;
+              state.submitButton.disabled = false;
+              setProtectedFormStatus(form, "Spam protection complete.", "success");
+            },
+            "expired-callback": () => {
+              state.verified = false;
+              state.submitButton.disabled = true;
+              setProtectedFormStatus(form, "Spam protection expired. Please complete it again.");
+            },
+            "error-callback": () => {
+              state.verified = false;
+              state.submitButton.disabled = true;
+              setProtectedFormStatus(form, "Spam protection is unavailable. Please email design@roseandpaw.ca.");
+            }
+          });
+        });
+      })
+      .catch(() => {
+        protectedForms.forEach((form) => {
+          if (form instanceof HTMLFormElement) {
+            setProtectedFormStatus(form, "Spam protection is unavailable. Please email design@roseandpaw.ca.");
+          }
+        });
+      });
+  }
+}
 
 if (contactForm instanceof HTMLFormElement) {
   const params = new URLSearchParams(window.location.search);
@@ -363,9 +558,10 @@ if (contactForm instanceof HTMLFormElement) {
       replaceFormWithSuccess();
     } catch (error) {
       showFormStatus("Sorry, the form could not be submitted. Please email design@roseandpaw.ca or try again.");
+      resetTurnstile(contactForm);
 
       if (submitButton instanceof HTMLButtonElement) {
-        submitButton.disabled = false;
+        submitButton.disabled = contactForm.hasAttribute("data-protected-form");
         submitButton.textContent = previousButtonText;
       }
     }
