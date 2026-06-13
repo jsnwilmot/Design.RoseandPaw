@@ -14,7 +14,6 @@ const packageLabels = {
 };
 const googleAnalyticsId = "G-9QEQZ3X94H";
 const turnstileSiteKey = "CONFIGURE_TURNSTILE_SITE_KEY";
-const submittedStorageKey = "rosePawQuoteFormSubmitted";
 const cookieConsentKey = "rosePawCookieConsent";
 let googleAnalyticsLoaded = false;
 
@@ -73,27 +72,6 @@ const trackEvent = (eventName, eventParams = {}) => {
   if (analyticsAllowed() && typeof window.gtag === "function") {
     window.gtag("event", eventName, eventParams);
   }
-};
-
-const markQuoteFormSubmitted = () => {
-  try {
-    window.sessionStorage.setItem(submittedStorageKey, "true");
-  } catch (error) {
-    // Storage can be unavailable in some privacy modes; the form still submits normally.
-  }
-};
-
-const clearQuoteFormSubmitted = () => {
-  try {
-    if (window.sessionStorage.getItem(submittedStorageKey) === "true") {
-      window.sessionStorage.removeItem(submittedStorageKey);
-      return true;
-    }
-  } catch (error) {
-    return false;
-  }
-
-  return false;
 };
 
 if (year) {
@@ -463,11 +441,6 @@ if (contactForm instanceof HTMLFormElement) {
   const budget = contactForm.elements.namedItem("budget_or_package_interest");
   const formStatus = contactForm.querySelector("[data-form-status]");
   const submitButton = contactForm.querySelector('button[type="submit"]');
-  const resetAfterSubmission = () => {
-    if (clearQuoteFormSubmitted()) {
-      contactForm.reset();
-    }
-  };
 
   const showFormStatus = (message, type = "error") => {
     if (!(formStatus instanceof HTMLElement)) {
@@ -567,8 +540,6 @@ if (contactForm instanceof HTMLFormElement) {
     }
   });
 
-  resetAfterSubmission();
-  window.addEventListener("pageshow", resetAfterSubmission);
 }
 
 const portfolioImages = document.querySelectorAll(".portfolio-preview img");
@@ -643,40 +614,6 @@ if (portfolioImages.length > 0) {
   document.body.append(lightbox);
 }
 
-if (document.body && document.body.dataset.page === "thank-you") {
-  const params = new URLSearchParams(window.location.search);
-  const formType = params.get("type");
-  const eyebrow = document.querySelector("[data-thank-you-eyebrow]");
-  const heading = document.querySelector("[data-thank-you-heading]");
-  const body = document.querySelector("[data-thank-you-body]");
-  const note = document.querySelector("[data-thank-you-note]");
-  const copy = {
-    quote: {
-      eyebrow: "Quote request sent",
-      heading: "Thank you. Your request has been received.",
-      body: "We'll review your project details and follow up with the next steps.",
-      note: "You can return to the website or email design@roseandpaw.ca if you need to add anything.",
-      event: "quote_form_submit"
-    },
-    intake: {
-      eyebrow: "Client intake sent",
-      heading: "Thank you. Your form has been received.",
-      body: "We'll review your details and follow up if anything else is needed before starting your project.",
-      note: "Your intake form helps us plan your website structure, content, style direction, and project requirements.",
-      event: "client_intake_submit"
-    }
-  };
-  const activeCopy = copy[formType] || null;
-
-  if (activeCopy) {
-    if (eyebrow) eyebrow.textContent = activeCopy.eyebrow;
-    if (heading) heading.textContent = activeCopy.heading;
-    if (body) body.textContent = activeCopy.body;
-    if (note) note.textContent = activeCopy.note;
-    trackEvent(activeCopy.event, { form_name: activeCopy.eyebrow });
-  }
-
-  if (formType === "quote") {
-    markQuoteFormSubmitted();
-  }
+if (document.body?.dataset.page === "thank-you") {
+  trackEvent("client_intake_submit", { form_name: "Client intake sent" });
 }

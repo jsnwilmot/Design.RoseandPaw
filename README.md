@@ -25,6 +25,14 @@ The site should not read as a Lethbridge-only business. Lethbridge is a credibil
 
 There is no build process. Deploy the static files directly.
 
+## Folder Structure
+
+- Root `*.html`, `styles.css`, and `script.js` - deployed website pages and shared assets
+- `images/` - delivery-ready public images referenced by the website
+- `_source-assets/` - original, editable, and print artwork retained in Git but excluded from GitHub Pages by Jekyll
+- `tools/` - local server, validation, Lighthouse, and image optimization scripts
+- `reports/` - ignored generated validation output; only `reports/.gitignore` is tracked
+
 ## Current Pages
 
 Public indexable pages:
@@ -54,7 +62,8 @@ Public form:
 - Page: `contact.html`
 - Purpose: quote / consultation requests
 - Action: `https://api.web3forms.com/submit`
-- Redirect: `https://design.roseandpaw.ca/thank-you.html?type=quote`
+- JavaScript workflow: validates and submits with `fetch`, then displays an inline success message
+- Non-JavaScript fallback: submits directly to Web3Forms
 - Required fields currently include name, email, service needed, and message.
 
 Unlisted form:
@@ -62,7 +71,7 @@ Unlisted form:
 - Page: `client-intake.html`
 - Purpose: project intake after a client relationship begins
 - Action: `https://api.web3forms.com/submit`
-- Redirect: `https://design.roseandpaw.ca/thank-you.html?type=intake`
+- Redirect: `https://design.roseandpaw.ca/thank-you.html`
 - Not linked from main navigation
 - Not included in `sitemap.xml`
 - Excluded from search indexing with a `noindex` meta tag
@@ -70,7 +79,7 @@ Unlisted form:
 
 Both forms use Cloudflare Turnstile and remain blocked until spam verification succeeds. Before deployment, replace the documented `CONFIGURE_TURNSTILE_SITE_KEY` placeholder in `script.js` with the production Turnstile public site key for `design.roseandpaw.ca`. Never add the Turnstile secret key to this repository.
 
-Before launch or after form edits, confirm Web3Forms access keys, required fields, redirects, Turnstile behavior, and thank-you behavior.
+Before launch or after form edits, confirm Web3Forms access keys, required fields, inline quote success, intake redirect, Turnstile behavior, and thank-you behavior.
 
 ## Analytics And Cookie Preferences
 
@@ -88,7 +97,7 @@ Current SEO setup includes:
 - Canonical URLs using `https://design.roseandpaw.ca`
 - Open Graph metadata on public pages
 - Twitter card metadata on public pages
-- Shared Open Graph image: `https://design.roseandpaw.ca/images/og-image.png`
+- Shared Open Graph image: `https://design.roseandpaw.ca/images/og-image.jpg`
 - `sitemap.xml` for public indexable pages only
 - `robots.txt` allows normal crawling so search engines can read `noindex` instructions and retains the sitemap reference
 - One clear H1 per page
@@ -171,7 +180,7 @@ Performance practices:
 - Do not lazy-load the above-the-fold hero/brand visual.
 - Use `loading="lazy"` on below-the-fold images.
 - Use WebP images where practical.
-- Keep `images/og-image.png` at a social-friendly 1200 x 630 ratio.
+- Keep `images/og-image.jpg` at a social-friendly 1200 x 630 ratio.
 - Keep `script.js` loaded with `defer`.
 - Keep animations and JavaScript lightweight.
 - Avoid layout shift in portfolio cards, review cards, and carousel areas.
@@ -203,6 +212,11 @@ Install dependencies once:
 npm install
 ```
 
+Current validated toolchain:
+
+- Node.js `v22.21.0`
+- npm `10.9.4`
+
 Run the local static server:
 
 ```bash
@@ -221,28 +235,21 @@ Run the structural checker:
 npm run check
 ```
 
-This validates JSON-LD syntax, local image paths, responsive source paths, and internal links.
+This checks JSON-LD, internal links and anchors, image and `srcset` references, duplicate IDs, public-page metadata, canonical URLs, H1 counts, form labels, image dimensions and alt text, linked CSS/JavaScript, target-blank security attributes, robots/noindex conflicts, and sitemap integrity. Blocking errors exit non-zero; metadata length recommendations are warnings.
 
-Review all `target="_blank"` links, form labels, robots rules, sitemap exclusions, consent defaults, and Turnstile configuration:
-
-```bash
-rg -n -g "*.html" "target=\"_blank\"|data-protected-form|data-cookie-settings"
-rg -n "analytics_storage|ad_storage|ad_user_data|ad_personalization|CONFIGURE_TURNSTILE_SITE_KEY" script.js
-```
-
-Run the default Lighthouse report against the homepage:
+Run Lighthouse against all main public pages:
 
 ```bash
 npm run lighthouse
 ```
 
-The report is written to:
+The runner starts the local server, uses the locally installed Lighthouse package, saves separate HTML and JSON results per page, and writes a concise summary:
 
 ```text
-reports/lighthouse-report.html
+reports/lighthouse/
 ```
 
-Generated reports are ignored by Git.
+Lighthouse requires a locally installed Chromium-based browser that the package can launch. Generated reports are ignored by Git and should not be committed.
 
 ## Deployment
 
@@ -250,21 +257,24 @@ For GitHub Pages:
 
 1. Confirm `CNAME` contains `design.roseandpaw.ca`.
 2. Confirm public pages, `images/`, `styles.css`, `script.js`, `sitemap.xml`, `robots.txt`, `404.html`, and `CNAME` are committed.
-3. Commit the changed files.
-4. Push to the branch configured for GitHub Pages.
-5. Wait for GitHub Pages to finish deployment.
-6. Test the live homepage, services, packages, portfolio, FAQ, contact, privacy, terms, sitemap, robots, and a missing URL for the custom 404.
-7. Submit or resubmit the sitemap in Google Search Console after meaningful sitemap or page changes.
+3. Confirm `_source-assets/` remains excluded by GitHub Pages/Jekyll and that `.nojekyll` has not been added.
+4. Commit the changed files.
+5. Push to the branch configured for GitHub Pages.
+6. Wait for GitHub Pages to finish deployment.
+7. Test the live homepage, services, packages, portfolio, FAQ, contact, privacy, terms, sitemap, robots, and a missing URL for the custom 404.
+8. Submit or resubmit the sitemap in Google Search Console after meaningful sitemap or page changes.
 
 ## Image Notes
 
 Main image locations:
 
-- Open Graph image: `images/og-image.png`
-- Favicon / touch icon: `images/favicon-192.png`
-- Logo assets: `images/rose-and-paw-logo-*.png` and `images/rose-and-paw-logo-*.webp`
+- Open Graph image: `images/og-image.jpg`
+- Favicons: `images/favicon-16.png`, `images/favicon-32.png`, `images/favicon-180.png`, and `images/favicon-192.png`
+- Responsive profile images: `images/ProfilePhoto-400.webp` and `images/ProfilePhoto-800.webp`
+- Logo delivery assets: `images/rose-and-paw-logo-*.webp`
 - Google review QR: `images/DigitalDesignsReviewQR.png` and `images/DigitalDesignsReviewQR.webp`
 - Portfolio assets: `images/PortfolioImages/`
+- Original, editable, and print artwork: `_source-assets/`
 
 After replacing images, check:
 
@@ -282,6 +292,13 @@ npm run optimize:images
 ```
 
 Only update HTML to use generated images after confirming the generated files look correct.
+
+## Known Limitations
+
+- A production Cloudflare Turnstile public site key must replace `CONFIGURE_TURNSTILE_SITE_KEY` in `script.js` before forms can submit.
+- Form spam protection relies on the Web3Forms integration accepting the Turnstile token; no private Turnstile secret is stored in this static repository.
+- `_source-assets/` exclusion relies on GitHub Pages publishing through Jekyll. Do not add `.nojekyll` without configuring another exclusion mechanism.
+- Lighthouse scores depend on the local browser and machine and must not be claimed unless the audit completed successfully.
 
 ## Maintenance Rules
 

@@ -964,8 +964,7 @@ dd {
 }
 
 dd a,
-.policy-content a,
-.contact-link {
+.policy-content a {
   color: var(--bronze);
   font-weight: 900;
   text-decoration: underline;
@@ -1081,12 +1080,6 @@ textarea {
   resize: vertical;
 }
 
-.form-note {
-  min-height: 1.5rem;
-  color: var(--bronze);
-  font-weight: 800;
-}
-
 .thank-you-section {
   position: relative;
   overflow: hidden;
@@ -1173,13 +1166,6 @@ textarea {
 .cta-actions {
   align-content: start;
   margin-top: 0;
-}
-
-.contact-link {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  color: #efc18a;
 }
 
 .site-footer {
@@ -1614,7 +1600,6 @@ textarea {
   box-shadow: 0 18px 42px rgba(7, 17, 31, 0.08);
 }
 
-.owner-photo-placeholder,
 .owner-photo {
   display: grid;
   aspect-ratio: 1;
@@ -1733,8 +1718,7 @@ body.has-lightbox {
     grid-template-columns: 1fr;
   }
 
-  .owner-photo-placeholder,
-.owner-photo {
+  .owner-photo {
     max-width: 240px;
   }
 }

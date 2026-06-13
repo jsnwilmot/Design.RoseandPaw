@@ -19,7 +19,7 @@ const largeHeroWidth = 1600;
 const minBytes = 100 * 1024;
 const supportedExtensions = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 const generatedPattern = /-(320|640|960|1280|1600)\.webp$/i;
-const keepOriginalNames = new Set(["favicon-192.png"]);
+const keepOriginalNames = new Set(["favicon-16.png", "favicon-32.png", "favicon-180.png", "favicon-192.png"]);
 
 const formatBytes = (bytes) => `${(bytes / 1024).toFixed(1)} KB`;
 
