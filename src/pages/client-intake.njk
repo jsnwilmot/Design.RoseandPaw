@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.njk
 permalink: client-intake.html
+hasCaptcha: true
 pageKey: client-intake
 breadcrumbName: "Client Intake"
 title: "Client Website Intake Form | Rose & Paw Digital Designs"
@@ -21,7 +22,7 @@ sitemap: false
 
       <section class="section section-cream">
         <div class="section-inner intake-card">
-          <form action="https://api.web3forms.com/submit" method="POST" data-protected-form>
+          <form action="https://api.web3forms.com/submit" method="POST" data-captcha-form>
             <input type="hidden" name="access_key" value="9786a91c-c3fd-4b9e-ad2d-3d55ec5807d5">
             <input type="hidden" name="subject" value="New client intake form submission">
             <input type="hidden" name="from_name" value="Rose & Paw Digital Designs Client Intake">
@@ -109,8 +110,8 @@ sitemap: false
               <label>Anything else the website should include <small>Add final notes, concerns, features, or instructions.</small><textarea name="extra_notes" rows="5"></textarea></label>
             </fieldset>
 
-            <div class="turnstile-container" data-turnstile tabindex="-1" role="group" aria-label="Spam protection"></div>
-            <p class="form-status" data-form-status aria-live="polite"></p>
+            <div class="h-captcha" data-captcha="true"></div>
+            <p class="form-status" data-form-status aria-live="polite" tabindex="-1"></p>
             <button class="button button-primary" type="submit">Submit Client Intake Form</button>
           </form>
         </div>

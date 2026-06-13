@@ -117,6 +117,43 @@ const checkAccessibility = (file, html) => {
   }
 };
 
+const captchaPages = new Map([
+  ["contact.html", "225df1dc-443f-4d80-8162-1d63333d4bda"],
+  ["client-intake.html", "9786a91c-c3fd-4b9e-ad2d-3d55ec5807d5"]
+]);
+
+const checkCaptchaForm = (file, html) => {
+  const captchaScriptCount = (html.match(/https:\/\/web3forms\.com\/client\/script\.js/gi) || []).length;
+  const expectedAccessKey = captchaPages.get(file);
+
+  if (!expectedAccessKey) {
+    if (captchaScriptCount > 0) issues.push(`${file}: Web3Forms CAPTCHA script must only load on CAPTCHA form pages`);
+    return;
+  }
+
+  if (captchaScriptCount !== 1) issues.push(`${file}: expected exactly one Web3Forms CAPTCHA script; found ${captchaScriptCount}`);
+  if ((html.match(/\bclass=["'][^"']*\bh-captcha\b[^"']*["']/gi) || []).length !== 1) {
+    issues.push(`${file}: expected exactly one hCaptcha container`);
+  }
+  if (!/\bdata-captcha=["']true["']/i.test(html)) issues.push(`${file}: hCaptcha container missing data-captcha="true"`);
+  if (!/\bdata-captcha-form\b/i.test(html)) issues.push(`${file}: form missing data-captcha-form`);
+  if (!new RegExp(`\\bname=["']access_key["'][^>]*\\bvalue=["']${escapeRegex(expectedAccessKey)}["']`, "i").test(html)) {
+    issues.push(`${file}: Web3Forms access key changed or is missing`);
+  }
+
+  const status = tags(html, "p").find((tag) => /\bdata-form-status\b/i.test(tag));
+  if (!status || attribute(status, "aria-live") !== "polite" || attribute(status, "tabindex") !== "-1") {
+    issues.push(`${file}: form status must be a focusable polite live region`);
+  }
+
+  const submitButton = tags(html, "button").find((tag) => attribute(tag, "type") === "submit");
+  if (!submitButton) {
+    issues.push(`${file}: missing submit button`);
+  } else if (/\bdisabled\b/i.test(submitButton)) {
+    issues.push(`${file}: submit button must be enabled initially`);
+  }
+};
+
 const sitemap = read("sitemap.xml");
 const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 const publicFiles = sitemapUrls.map((url) => new URL(url).pathname.replace(/^\/$/, "/index.html").replace(/^\//, ""));
@@ -130,6 +167,7 @@ for (const file of htmlFiles) {
   checkImages(file, html);
   checkLinksAndAssets(file, html);
   checkAccessibility(file, html);
+  checkCaptchaForm(file, html);
 
   if (!publicFiles.includes(file)) continue;
 
@@ -157,6 +195,18 @@ for (const file of htmlFiles) {
     canonicalOwners.set(canonical, file);
   }
 }
+
+const browserScript = read("script.js");
+for (const pattern of [
+  ["Turnstile placeholder", /CONFIGURE_TURNSTILE_SITE_KEY/i],
+  ["Turnstile API", /challenges\.cloudflare\.com\/turnstile/i],
+  ["Turnstile runtime", /\b(?:window\.)?turnstile\b/i],
+  ["legacy protected form hook", /data-protected-form/i]
+]) {
+  if (pattern[1].test(browserScript)) issues.push(`script.js: contains unsupported ${pattern[0]}`);
+}
+if (!/h-captcha-response/i.test(browserScript)) issues.push("script.js: missing hCaptcha response validation");
+if (!/Please complete the spam protection check\./i.test(browserScript)) issues.push("script.js: missing accessible CAPTCHA error message");
 
 for (const [url, file] of sitemapUrls.map((url, index) => [url, publicFiles[index]])) {
   if (!exists(file)) issues.push(`sitemap.xml: URL does not map to an existing file: ${url}`);

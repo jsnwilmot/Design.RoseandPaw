@@ -5,6 +5,5 @@ eleventyExcludeFromCollections: true
 window.siteConfig = {{ {
   "analyticsId": business.analyticsId,
   "email": business.email,
-  "turnstileSiteKey": site.turnstileSiteKey,
   "packages": packages
 } | json | safe }};

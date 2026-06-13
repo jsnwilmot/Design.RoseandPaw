@@ -87,9 +87,9 @@ Only the nine indexable public pages are generated into `sitemap.xml`. Client in
 
 ## Forms And Browser Configuration
 
-Forms continue to use Web3Forms and Cloudflare Turnstile. The public quote form submits with JavaScript and displays inline success; its non-JavaScript fallback submits directly to Web3Forms. The unlisted client intake form redirects to `/thank-you.html`.
+Forms use Web3Forms with its zero-configuration hCaptcha integration. The public quote form submits with JavaScript and displays inline success; its non-JavaScript fallback submits directly to Web3Forms. The unlisted client intake form redirects to `/thank-you.html`.
 
-`src/site-config.js.njk` generates non-secret browser configuration from shared data. Before deployment, replace `CONFIGURE_TURNSTILE_SITE_KEY` in `src/_data/site.json` with the production public Turnstile site key. Never store a Turnstile secret or other private credential in this repository.
+Select hCaptcha for each form in the Web3Forms dashboard. Web3Forms supplies the hCaptcha configuration, so this repository does not require a CAPTCHA site key or secret. Cloudflare Turnstile is not used because Web3Forms requires a paid plan for that integration.
 
 Google Analytics 4 uses the Measurement ID in `src/_data/business.json` and loads only after analytics consent. Advertising storage, user data, and personalization remain denied.
 
@@ -142,6 +142,5 @@ For Cloudflare Pages:
 
 ## Known Limitations
 
-- Forms remain blocked until a production Turnstile public site key is configured.
-- Successful Web3Forms delivery requires live third-party service access and cannot be fully proven by local static checks.
+- Successful Web3Forms and hCaptcha delivery requires the corresponding Web3Forms dashboard configuration and live third-party service access, so it cannot be fully proven by local static checks.
 - Lighthouse scores depend on the local browser and machine.

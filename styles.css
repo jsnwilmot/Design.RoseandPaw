@@ -1649,9 +1649,8 @@ textarea {
   color: #336c45;
 }
 
-.turnstile-container {
-  min-height: 65px;
-  outline: none;
+.h-captcha {
+  min-height: 78px;
 }
 
 .form-success {

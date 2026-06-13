@@ -10,7 +10,6 @@ const siteConfig = window.siteConfig || {};
 const packageLabels = Object.fromEntries((siteConfig.packages || []).map((item) => [item.id, item.contactValue]));
 const googleAnalyticsId = siteConfig.analyticsId || "";
 const businessEmail = siteConfig.email;
-const turnstileSiteKey = siteConfig.turnstileSiteKey || "CONFIGURE_TURNSTILE_SITE_KEY";
 const cookieConsentKey = "rosePawCookieConsent";
 let googleAnalyticsLoaded = false;
 
@@ -303,134 +302,65 @@ document.addEventListener("click", (event) => {
   }
 });
 
-const protectedForms = document.querySelectorAll("[data-protected-form]");
-const turnstileStates = new WeakMap();
+const captchaForms = document.querySelectorAll("[data-captcha-form]");
 
-const loadTurnstile = () => new Promise((resolve, reject) => {
-  if (window.turnstile) {
-    resolve(window.turnstile);
-    return;
-  }
-
-  const existingScript = document.querySelector("[data-turnstile-script]");
-  if (existingScript) {
-    existingScript.addEventListener("load", () => resolve(window.turnstile), { once: true });
-    existingScript.addEventListener("error", reject, { once: true });
-    return;
-  }
-
-  const script = document.createElement("script");
-  script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-  script.async = true;
-  script.defer = true;
-  script.dataset.turnstileScript = "";
-  script.addEventListener("load", () => resolve(window.turnstile), { once: true });
-  script.addEventListener("error", reject, { once: true });
-  document.head.append(script);
-});
-
-const setProtectedFormStatus = (form, message, type = "error") => {
+const setFormStatus = (form, message, type = "error", focus = false) => {
   const status = form.querySelector("[data-form-status]");
   if (status instanceof HTMLElement) {
     status.textContent = message;
     status.dataset.status = type;
+    if (focus) {
+      status.focus({ preventScroll: true });
+    }
   }
 };
 
-const resetTurnstile = (form) => {
-  const state = turnstileStates.get(form);
-  if (!state || !window.turnstile || state.widgetId === null) {
+const getCaptchaResponse = (form) => {
+  const response = form.querySelector('textarea[name="h-captcha-response"], input[name="h-captcha-response"]');
+  return response instanceof HTMLTextAreaElement || response instanceof HTMLInputElement
+    ? response.value.trim()
+    : "";
+};
+
+const requireCaptchaResponse = (form) => {
+  if (getCaptchaResponse(form)) {
+    return true;
+  }
+
+  setFormStatus(form, "Please complete the spam protection check.", "error", true);
+  return false;
+};
+
+const resetCaptcha = () => {
+  try {
+    if (window.hcaptcha && typeof window.hcaptcha.reset === "function") {
+      window.hcaptcha.reset();
+    }
+  } catch (error) {
+    // CAPTCHA reset is best-effort after a failed request.
+  }
+};
+
+captchaForms.forEach((form) => {
+  if (!(form instanceof HTMLFormElement) || form.hasAttribute("data-contact-form")) {
     return;
   }
 
-  state.verified = false;
-  state.submitButton.disabled = true;
-  window.turnstile.reset(state.widgetId);
-};
-
-if (protectedForms.length > 0) {
-  protectedForms.forEach((form) => {
-    if (!(form instanceof HTMLFormElement)) {
+  form.addEventListener("submit", (event) => {
+    if (!requireCaptchaResponse(form)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
       return;
     }
 
     const submitButton = form.querySelector('button[type="submit"]');
-    const container = form.querySelector("[data-turnstile]");
-    if (!(submitButton instanceof HTMLButtonElement) || !(container instanceof HTMLElement)) {
-      return;
+    if (submitButton instanceof HTMLButtonElement) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting...";
     }
-
-    const state = { submitButton, verified: false, widgetId: null };
-    turnstileStates.set(form, state);
-    submitButton.disabled = true;
-    setProtectedFormStatus(form, "Complete the spam protection check before submitting.", "info");
-
-    form.addEventListener("submit", (event) => {
-      if (state.verified) {
-        if (!form.hasAttribute("data-contact-form")) {
-          state.submitButton.disabled = true;
-          state.submitButton.textContent = "Submitting...";
-          setProtectedFormStatus(form, "Submitting your form.", "info");
-        }
-        return;
-      }
-
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      setProtectedFormStatus(form, "Please complete the spam protection check before submitting.");
-      container.focus();
-    });
-  });
-
-  if (turnstileSiteKey === "CONFIGURE_TURNSTILE_SITE_KEY") {
-    protectedForms.forEach((form) => {
-      if (form instanceof HTMLFormElement) {
-        setProtectedFormStatus(form, `Spam protection is not configured. Please email ${businessEmail}.`);
-      }
-    });
-  } else {
-    loadTurnstile()
-      .then((turnstile) => {
-        protectedForms.forEach((form) => {
-          if (!(form instanceof HTMLFormElement)) {
-            return;
-          }
-
-          const state = turnstileStates.get(form);
-          const container = form.querySelector("[data-turnstile]");
-          if (!state || !(container instanceof HTMLElement)) {
-            return;
-          }
-
-          state.widgetId = turnstile.render(container, {
-            sitekey: turnstileSiteKey,
-            callback: () => {
-              state.verified = true;
-              state.submitButton.disabled = false;
-              setProtectedFormStatus(form, "Spam protection complete.", "success");
-            },
-            "expired-callback": () => {
-              state.verified = false;
-              state.submitButton.disabled = true;
-              setProtectedFormStatus(form, "Spam protection expired. Please complete it again.");
-            },
-            "error-callback": () => {
-              state.verified = false;
-              state.submitButton.disabled = true;
-              setProtectedFormStatus(form, `Spam protection is unavailable. Please email ${businessEmail}.`);
-            }
-          });
-        });
-      })
-      .catch(() => {
-        protectedForms.forEach((form) => {
-          if (form instanceof HTMLFormElement) {
-            setProtectedFormStatus(form, `Spam protection is unavailable. Please email ${businessEmail}.`);
-          }
-        });
-      });
-  }
-}
+    setFormStatus(form, "Submitting your form.", "info");
+  }, { capture: true });
+});
 
 if (contactForm instanceof HTMLFormElement) {
   const params = new URLSearchParams(window.location.search);
@@ -505,6 +435,10 @@ if (contactForm instanceof HTMLFormElement) {
       return;
     }
 
+    if (!requireCaptchaResponse(contactForm)) {
+      return;
+    }
+
     const previousButtonText = submitButton instanceof HTMLButtonElement ? submitButton.textContent : "";
 
     if (submitButton instanceof HTMLButtonElement) {
@@ -528,10 +462,10 @@ if (contactForm instanceof HTMLFormElement) {
       replaceFormWithSuccess();
     } catch (error) {
       showFormStatus(`Sorry, the form could not be submitted. Please email ${businessEmail} or try again.`);
-      resetTurnstile(contactForm);
+      resetCaptcha();
 
       if (submitButton instanceof HTMLButtonElement) {
-        submitButton.disabled = contactForm.hasAttribute("data-protected-form");
+        submitButton.disabled = false;
         submitButton.textContent = previousButtonText;
       }
     }
