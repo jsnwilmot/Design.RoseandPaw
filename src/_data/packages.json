@@ -1,0 +1,48 @@
+[
+  {
+    "id": "starter",
+    "name": "Starter Website",
+    "price": "499",
+    "priceDisplay": "From $499",
+    "contactValue": "Starter Website from $499",
+    "bestFor": "New businesses that need a simple online presence.",
+    "features": ["1-page website", "Mobile-friendly layout", "Basic contact section", "Basic SEO setup", "Social links", "1 round of revisions"],
+    "cta": "Ask about Starter",
+    "buttonClass": "button-secondary"
+  },
+  {
+    "id": "launch",
+    "name": "Launch Package",
+    "price": "899",
+    "priceDisplay": "From $899",
+    "contactValue": "Launch Package from $899",
+    "bestFor": "Small businesses that need a stronger website with basic SEO.",
+    "features": ["3 to 5 page website", "Mobile-friendly design", "Basic SEO optimization", "Contact form setup", "Google Business Profile setup or cleanup", "2 rounds of revisions"],
+    "cta": "Ask about Launch",
+    "buttonClass": "button-secondary"
+  },
+  {
+    "id": "growth",
+    "name": "Growth Package",
+    "price": "1299",
+    "priceDisplay": "From $1,299",
+    "contactValue": "Growth Package from $1,299",
+    "bestFor": "Businesses that want website, SEO, profile setup, and brand support.",
+    "features": ["5 to 7 page website", "SEO optimization", "Google Business Profile optimization", "Yelp Business Profile optimization", "Basic keyword setup", "Business card print-ready design", "4 social media post designs", "2 rounds of revisions"],
+    "cta": "Ask about Growth",
+    "buttonClass": "button-primary",
+    "featured": true,
+    "label": "Popular for local visibility"
+  },
+  {
+    "id": "complete",
+    "name": "Complete Brand Package",
+    "price": "1799",
+    "priceDisplay": "From $1,799",
+    "contactValue": "Complete Brand Package from $1,799",
+    "bestFor": "Businesses that want a more complete launch package with website, profiles, cards, and social content.",
+    "features": ["7 to 10 page website", "Full SEO optimization", "Google Business Profile optimization", "Yelp Business Profile optimization", "Business card print-ready design", "8 social media post designs", "Basic brand style setup", "Launch support", "3 rounds of revisions"],
+    "cta": "Ask about Complete",
+    "buttonClass": "button-secondary"
+  }
+]

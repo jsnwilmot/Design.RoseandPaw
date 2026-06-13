@@ -1,0 +1,21 @@
+{
+  "name": "Rose & Paw Digital Designs",
+  "shortName": "Rose & Paw",
+  "url": "https://design.roseandpaw.ca/",
+  "email": "design@roseandpaw.ca",
+  "telephone": "250-588-4578",
+  "telephoneHref": "+12505884578",
+  "locality": "Lethbridge",
+  "region": "Alberta",
+  "country": "CA",
+  "serviceArea": "Canada",
+  "serviceAreaDisplay": "Canada-wide",
+  "calendlyUrl": "https://calendly.com/design-roseandpaw",
+  "facebookUrl": "https://fb.com/roseandpawdesigns",
+  "analyticsId": "G-9QEQZ3X94H",
+  "logo": "images/rose-and-paw-logo-720.webp",
+  "logoSmall": "images/rose-and-paw-logo-180.webp",
+  "logoMedium": "images/rose-and-paw-logo-360.webp",
+  "defaultOgImage": "images/og-image.jpg",
+  "description": "Affordable website design, basic SEO setup, business profile setup, business card design, and social media graphics for small businesses across Canada."
+}

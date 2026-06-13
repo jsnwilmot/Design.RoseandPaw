@@ -1,339 +1,147 @@
 # Rose & Paw Digital Designs
 
-Static HTML/CSS/JavaScript website for Rose & Paw Digital Designs.
+Eleventy-generated static website for Rose & Paw Digital Designs.
 
 Live site: https://design.roseandpaw.ca
 
-Last updated: June 13, 2026
+## Architecture
 
-## Purpose
-
-Rose & Paw Digital Designs is based in Lethbridge, Alberta and serves small businesses across Canada. The website presents affordable small business website design as the main service, with basic SEO setup, Google and Yelp profile support, business card design, social media graphics, and related digital design support.
-
-The site should not read as a Lethbridge-only business. Lethbridge is a credibility and location detail; the service area is Canada-wide.
-
-## Tech Stack
-
-- Static HTML files at the repo root
-- CSS in `styles.css`
-- Vanilla JavaScript in `script.js`
-- Web3Forms for form submissions
-- Google Analytics 4 consent handling in `script.js` using Measurement ID `G-9QEQZ3X94H`
-- Cloudflare Turnstile spam protection for website forms
-- GitHub Pages custom domain via `CNAME`
-- Optional local Node.js tools for checking links/schema, serving locally, Lighthouse, and image optimization
-
-There is no build process. Deploy the static files directly.
-
-## Folder Structure
-
-- Root `*.html`, `styles.css`, and `script.js` - deployed website pages and shared assets
-- `images/` - delivery-ready public images referenced by the website
-- `_source-assets/` - original, editable, and print artwork retained in Git but excluded from GitHub Pages by Jekyll
-- `tools/` - local server, validation, Lighthouse, and image optimization scripts
-- `reports/` - ignored generated validation output; only `reports/.gitignore` is tracked
-
-## Current Pages
-
-Public indexable pages:
-
-- `index.html` - Homepage
-- `services.html` - Website design and supporting services
-- `packages.html` - Website packages and pricing
-- `portfolio.html` - Portfolio and sample work
-- `about.html` - Business background
-- `faq.html` - FAQ content and FAQPage structured data
-- `contact.html` - Public consultation/contact form
-- `privacy.html` - Privacy policy
-- `terms.html` - Terms and service policy
-
-Utility and non-index pages:
-
-- `404.html` - Custom page-not-found page
-- `thank-you.html` - Form confirmation page, `noindex`
-- `client-intake.html` - Unlisted client intake form that is excluded from search indexing. The page is not password protected.
-
-Utility and unlisted pages are not linked from the main navigation and are not included in `sitemap.xml`.
-
-## Forms
-
-Public form:
-
-- Page: `contact.html`
-- Purpose: quote / consultation requests
-- Action: `https://api.web3forms.com/submit`
-- JavaScript workflow: validates and submits with `fetch`, then displays an inline success message
-- Non-JavaScript fallback: submits directly to Web3Forms
-- Required fields currently include name, email, service needed, and message.
-
-Unlisted form:
-
-- Page: `client-intake.html`
-- Purpose: project intake after a client relationship begins
-- Action: `https://api.web3forms.com/submit`
-- Redirect: `https://design.roseandpaw.ca/thank-you.html`
-- Not linked from main navigation
-- Not included in `sitemap.xml`
-- Excluded from search indexing with a `noindex` meta tag
-- Not password protected
-
-Both forms use Cloudflare Turnstile and remain blocked until spam verification succeeds. Before deployment, replace the documented `CONFIGURE_TURNSTILE_SITE_KEY` placeholder in `script.js` with the production Turnstile public site key for `design.roseandpaw.ca`. Never add the Turnstile secret key to this repository.
-
-Before launch or after form edits, confirm Web3Forms access keys, required fields, inline quote success, intake redirect, Turnstile behavior, and thank-you behavior.
-
-## Analytics And Cookie Preferences
-
-- Google Analytics 4 is configured with Measurement ID `G-9QEQZ3X94H`.
-- GA4 loads only after the visitor accepts analytics cookies.
-- Advertising storage, user data, and personalization consent remain denied.
-- Every page footer includes a `Cookie settings` button so visitors can review, revise, or withdraw consent.
-- Withdrawing analytics consent updates Google Consent Mode and does not inject GA4 again during the current page session.
-
-## SEO Features
-
-Current SEO setup includes:
-
-- Unique title tags and meta descriptions on public pages
-- Canonical URLs using `https://design.roseandpaw.ca`
-- Open Graph metadata on public pages
-- Twitter card metadata on public pages
-- Shared Open Graph image: `https://design.roseandpaw.ca/images/og-image.jpg`
-- `sitemap.xml` for public indexable pages only
-- `robots.txt` allows normal crawling so search engines can read `noindex` instructions and retains the sitemap reference
-- One clear H1 per page
-- Descriptive internal links and CTA text
-- Image `alt`, `width`, and `height` attributes where practical
-
-Do not use old business name variants. The official name is:
+Eleventy and Nunjucks generate plain HTML, CSS, JavaScript, images, `robots.txt`, `sitemap.xml`, and `CNAME` into `_site/`. There is no client-side framework or runtime template fetching.
 
 ```text
-Rose & Paw Digital Designs
+src/
+  _data/                 Shared business, navigation, package, FAQ, and site data
+  _includes/
+    layouts/             Base page layout
+    partials/            Shared head, header, footer, and structured data
+  pages/                 Page-specific semantic content and metadata
+  site-config.js.njk     Non-secret browser configuration generated from shared data
+  sitemap.xml.njk        Sitemap generated from page front matter
+images/                  Public delivery-ready images, copied to _site/images
+_source-assets/          Original/editable assets retained in Git, never deployed
+tools/                   Validation, local server, Lighthouse, and image tools
+reports/                 Ignored generated reports; only reports/.gitignore is tracked
+_site/                   Ignored generated deployment output
 ```
 
-## Structured Data
+Shared content is maintained in:
 
-Structured data is embedded as JSON-LD.
+- `src/_data/business.json`: business identity, contact details, URLs, logos, analytics ID
+- `src/_data/navigation.json`: header and footer navigation
+- `src/_data/packages.json`: package cards, prices, form values, URL mapping, and Offer schema
+- `src/_data/faq.json`: visible FAQ answers and FAQPage schema
+- `src/_data/site.json`: non-secret site configuration and maintained sitemap date
+- `src/pages/*.njk`: page metadata/front matter and page-specific content
 
-Homepage `index.html` includes:
+Do not manually create root HTML files. Edit source templates/data and build.
 
-- `LocalBusiness` and `ProfessionalService`
-- `Organization`
-- `WebSite`
-- `BreadcrumbList`
+## Requirements
 
-The homepage business schema should stay accurate:
+- Node.js 22
+- npm 10
 
-- Name: `Rose & Paw Digital Designs`
-- URL: `https://design.roseandpaw.ca/`
-- Phone: `250-588-4578`
-- Email: `design@roseandpaw.ca`
-- Location: Lethbridge, Alberta, Canada
-- Area served: Canada
-- Services: website design, basic SEO setup, business profile setup, business card design, social media graphics
-
-`faq.html` includes `FAQPage` structured data. The FAQ schema must match the visible FAQ questions and answers in the page HTML. When FAQ content changes, update the visible FAQ and the JSON-LD together.
-
-Do not add `Review` or `AggregateRating` schema unless the visible review markup and schema follow Google structured data rules. When unsure, keep reviews visible only and do not add review schema.
-
-## Sitemap And Robots
-
-`sitemap.xml` should include only public indexable URLs:
-
-- `https://design.roseandpaw.ca/`
-- `https://design.roseandpaw.ca/services.html`
-- `https://design.roseandpaw.ca/packages.html`
-- `https://design.roseandpaw.ca/portfolio.html`
-- `https://design.roseandpaw.ca/about.html`
-- `https://design.roseandpaw.ca/faq.html`
-- `https://design.roseandpaw.ca/contact.html`
-- `https://design.roseandpaw.ca/privacy.html`
-- `https://design.roseandpaw.ca/terms.html`
-
-Do not include `client-intake.html`, `thank-you.html`, `404.html`, test pages, drafts, local reports, or utility files.
-
-Current `robots.txt`:
-
-```text
-User-agent: *
-Allow: /
-
-Sitemap: https://design.roseandpaw.ca/sitemap.xml
-```
-
-Do not broadly block CSS, JavaScript, image folders, or other assets needed to render pages.
-
-## Performance
-
-Current local Lighthouse results for the main public pages:
-
-| Page | Performance | Accessibility | Best Practices | SEO |
-|---|---:|---:|---:|---:|
-| `/` | 99 | 100 | 100 | 100 |
-| `/services.html` | 100 | 100 | 100 | 100 |
-| `/packages.html` | 100 | 100 | 100 | 100 |
-| `/portfolio.html` | 99 | 100 | 100 | 100 |
-| `/faq.html` | 99 | 100 | 100 | 100 |
-| `/contact.html` | 100 | 100 | 100 | 100 |
-
-Performance practices:
-
-- Do not lazy-load the above-the-fold hero/brand visual.
-- Use `loading="lazy"` on below-the-fold images.
-- Use WebP images where practical.
-- Keep `images/og-image.jpg` at a social-friendly 1200 x 630 ratio.
-- Keep `script.js` loaded with `defer`.
-- Keep animations and JavaScript lightweight.
-- Avoid layout shift in portfolio cards, review cards, and carousel areas.
-
-Run PageSpeed Insights on the live deployed site before treating performance as final.
-
-## Accessibility
-
-Accessibility expectations:
-
-- One H1 per page
-- Logical heading order
-- Visible form labels connected to inputs
-- Buttons and links with clear text
-- Keyboard-accessible navigation and mobile menu
-- Visible focus states
-- Useful alt text for content images
-- Empty alt text for decorative repeated logo images when visible text already names the brand
-- Readable color contrast
-- No “click here” link text
-
-Run Lighthouse after accessibility-related edits and manually review forms, navigation, CTAs, and image alt text.
-
-## Local Checks
-
-Install dependencies once:
+Install the locked dependencies:
 
 ```bash
-npm install
+npm ci
 ```
 
-Current validated toolchain:
-
-- Node.js `v22.21.0`
-- npm `10.9.4`
-
-Run the local static server:
+## Commands
 
 ```bash
-npm run serve
-```
-
-Open:
-
-```text
-http://127.0.0.1:3000/
-```
-
-Run the structural checker:
-
-```bash
+npm run dev
+npm run build
 npm run check
-```
-
-This checks JSON-LD, internal links and anchors, image and `srcset` references, duplicate IDs, public-page metadata, canonical URLs, H1 counts, form labels, image dimensions and alt text, linked CSS/JavaScript, target-blank security attributes, robots/noindex conflicts, and sitemap integrity. Blocking errors exit non-zero; metadata length recommendations are warnings.
-
-Run Lighthouse against all main public pages:
-
-```bash
 npm run lighthouse
-```
-
-The runner starts the local server, uses the locally installed Lighthouse package, saves separate HTML and JSON results per page, and writes a concise summary:
-
-```text
-reports/lighthouse/
-```
-
-Lighthouse requires a locally installed Chromium-based browser that the package can launch. Generated reports are ignored by Git and should not be committed.
-
-## Deployment
-
-For GitHub Pages:
-
-1. Confirm `CNAME` contains `design.roseandpaw.ca`.
-2. Confirm public pages, `images/`, `styles.css`, `script.js`, `sitemap.xml`, `robots.txt`, `404.html`, and `CNAME` are committed.
-3. Confirm `_source-assets/` remains excluded by GitHub Pages/Jekyll and that `.nojekyll` has not been added.
-4. Commit the changed files.
-5. Push to the branch configured for GitHub Pages.
-6. Wait for GitHub Pages to finish deployment.
-7. Test the live homepage, services, packages, portfolio, FAQ, contact, privacy, terms, sitemap, robots, and a missing URL for the custom 404.
-8. Submit or resubmit the sitemap in Google Search Console after meaningful sitemap or page changes.
-
-## Image Notes
-
-Main image locations:
-
-- Open Graph image: `images/og-image.jpg`
-- Favicons: `images/favicon-16.png`, `images/favicon-32.png`, `images/favicon-180.png`, and `images/favicon-192.png`
-- Responsive profile images: `images/ProfilePhoto-400.webp` and `images/ProfilePhoto-800.webp`
-- Logo delivery assets: `images/rose-and-paw-logo-*.webp`
-- Google review QR: `images/DigitalDesignsReviewQR.png` and `images/DigitalDesignsReviewQR.webp`
-- Portfolio assets: `images/PortfolioImages/`
-- Original, editable, and print artwork: `_source-assets/`
-
-After replacing images, check:
-
-- File path references
-- `srcset` values
-- `alt` text
-- `width` and `height`
-- Lazy-loading behavior
-- Lighthouse image-delivery notes
-
-Optional responsive WebP generation:
-
-```bash
 npm run optimize:images
 ```
 
-Only update HTML to use generated images after confirming the generated files look correct.
+- `npm run dev`: Eleventy development server with rebuilds
+- `npm run build`: generate `_site/`
+- `npm run check`: build, then validate the generated site
+- `npm run lighthouse`: build, then audit all public pages and write ignored reports
+- `npm run optimize:images`: optional source image optimization helper
 
-## Known Limitations
+Validation covers JSON-LD, internal links and anchors, images and `srcset`, duplicate IDs, H1 counts, metadata, canonicals, sitemap/noindex rules, form labels, linked assets, and external-link security.
 
-- A production Cloudflare Turnstile public site key must replace `CONFIGURE_TURNSTILE_SITE_KEY` in `script.js` before forms can submit.
-- Form spam protection relies on the Web3Forms integration accepting the Turnstile token; no private Turnstile secret is stored in this static repository.
-- `_source-assets/` exclusion relies on GitHub Pages publishing through Jekyll. Do not add `.nojekyll` without configuring another exclusion mechanism.
-- Lighthouse scores depend on the local browser and machine and must not be claimed unless the audit completed successfully.
+## Public URLs
+
+The build preserves:
+
+- `/`
+- `/services.html`
+- `/packages.html`
+- `/portfolio.html`
+- `/about.html`
+- `/faq.html`
+- `/contact.html`
+- `/privacy.html`
+- `/terms.html`
+- `/client-intake.html`
+- `/thank-you.html`
+- `/404.html`
+- `/robots.txt`
+- `/sitemap.xml`
+
+Only the nine indexable public pages are generated into `sitemap.xml`. Client intake, thank-you, and 404 pages remain excluded.
+
+## Forms And Browser Configuration
+
+Forms continue to use Web3Forms and Cloudflare Turnstile. The public quote form submits with JavaScript and displays inline success; its non-JavaScript fallback submits directly to Web3Forms. The unlisted client intake form redirects to `/thank-you.html`.
+
+`src/site-config.js.njk` generates non-secret browser configuration from shared data. Before deployment, replace `CONFIGURE_TURNSTILE_SITE_KEY` in `src/_data/site.json` with the production public Turnstile site key. Never store a Turnstile secret or other private credential in this repository.
+
+Google Analytics 4 uses the Measurement ID in `src/_data/business.json` and loads only after analytics consent. Advertising storage, user data, and personalization remain denied.
+
+## SEO And Structured Data
+
+Page titles, descriptions, robots directives, canonicals, sitemap inclusion, change frequency, and priority live in each page's front matter.
+
+Shared structured data is generated from centralized data:
+
+- Homepage: `LocalBusiness`, `ProfessionalService`, `Organization`, `WebSite`, and breadcrumbs
+- Services: `Service` and breadcrumbs
+- Packages: `OfferCatalog` from package data and breadcrumbs
+- FAQ: `FAQPage` from visible FAQ data and breadcrumbs
+- Other pages: breadcrumbs
+
+Do not add unsupported `Review` or `AggregateRating` schema.
+
+## Deployment
+
+Generated output is not committed.
+
+GitHub Pages deploys `_site/` through `.github/workflows/deploy-pages.yml`:
+
+1. Install with `npm ci`
+2. Build and validate with `npm run check`
+3. Upload `_site/`
+4. Deploy through GitHub Pages Actions
+
+Configure GitHub Pages source as **GitHub Actions**.
+
+For Cloudflare Pages:
+
+- Build command: `npm run build`
+- Output directory: `_site`
+- Node version: `22`
+
+`CNAME`, `robots.txt`, public images, `styles.css`, and browser scripts are copied into `_site/` during the build. `_source-assets/`, `_site/`, reports, and development files are not deployed.
 
 ## Maintenance Rules
 
-Keep `README.md` current in the same change set whenever changing:
+- Preserve current public URLs and canonical URLs.
+- Keep one H1 per page and semantic landmarks/forms.
+- Update shared data instead of duplicating values in templates or JavaScript.
+- Keep package prices, cards, contact options, URL selection, and schema synchronized through `packages.json`.
+- Keep visible FAQ content and FAQ schema synchronized through `faq.json`.
+- Update `site.lastModified` when making meaningful public content changes.
+- Keep `_site/` and generated reports out of Git.
+- Run `npm run check` and rendered browser QA after template, content, form, or navigation changes.
+- Do not invent testimonials, client claims, ranking guarantees, fake results, or fake portfolio work.
 
-- Pages
-- Navigation
-- Forms
-- SEO metadata
-- Structured data
-- `sitemap.xml`
-- `robots.txt`
-- Images or the Open Graph image
-- Portfolio items
-- Package names, pricing, or inclusions
-- Contact details
-- Deployment behavior
+## Known Limitations
 
-Content maintenance notes:
-
-- Update `index.html` for homepage copy, reviews, trust points, and primary CTAs.
-- Update `services.html` when services or positioning changes.
-- Update `packages.html` when pricing, package names, or “Best for” wording changes.
-- Update `portfolio.html` when adding real portfolio items or clearly labelled sample work.
-- Update `faq.html` visible FAQ content and FAQPage JSON-LD together.
-- Update `contact.html`, `client-intake.html`, and `thank-you.html` when form behavior changes.
-- Update `privacy.html` and `terms.html` when tracking, forms, third-party services, or business policies change.
-- Update `sitemap.xml` when public indexable pages are added, removed, or renamed.
-- Update `robots.txt` only for intentional crawl rules; do not block render assets.
-- Update homepage structured data when the business name, URL, phone, email, services, service area, or social links change.
-
-Do not invent testimonials, client claims, ranking guarantees, fake results, or fake portfolio work. Label sample work clearly.
-
-## Public Contact Details
-
-- Email: `design@roseandpaw.ca`
-- Phone: `250-588-4578`
-- Facebook: `https://fb.com/roseandpawdesigns`
+- Forms remain blocked until a production Turnstile public site key is configured.
+- Successful Web3Forms delivery requires live third-party service access and cannot be fully proven by local static checks.
+- Lighthouse scores depend on the local browser and machine.

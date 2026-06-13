@@ -1,0 +1,11 @@
+    <header class="site-header" data-header>
+      <nav class="nav-shell" aria-label="Primary navigation">
+        <a class="brand-link" href="index.html"><img src="{{ business.logoSmall }}" srcset="{{ business.logoSmall }} 180w, {{ business.logoMedium }} 360w" sizes="52px" width="72" height="73" decoding="async" alt=""><span><strong>{{ business.shortName }}</strong><small>Digital Designs</small></span></a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-menu" data-nav-toggle><span class="sr-only">Open navigation</span><span aria-hidden="true"></span></button>
+        <div class="primary-menu" id="primary-menu" data-menu>
+          {% for item in navigation.header %}<a href="{{ item.url }}"{% if item.key == pageKey %} aria-current="page"{% endif %}>{{ item.label }}</a>{% endfor %}
+          <a href="{{ business.calendlyUrl }}" target="_blank" rel="noopener noreferrer">Book a Call</a>
+          <a class="nav-cta" href="contact.html"{% if pageKey == "contact" %} aria-current="page"{% endif %} data-track="quote_click">Request a Quote</a>
+        </div>
+      </nav>
+    </header>

@@ -4,7 +4,7 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const rootDir = path.resolve(process.cwd());
+const rootDir = path.resolve(process.env.SITE_DIR || path.join(process.cwd(), "_site"));
 const port = Number(process.env.PORT || 3000);
 const host = "127.0.0.1";
 const types = {

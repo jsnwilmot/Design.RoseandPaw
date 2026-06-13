@@ -3,7 +3,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const rootDir = process.cwd();
+const rootDir = path.resolve(process.env.SITE_DIR || path.join(process.cwd(), "_site"));
 const htmlFiles = fs.readdirSync(rootDir).filter((file) => file.endsWith(".html")).sort();
 const issues = [];
 const warnings = [];
@@ -14,6 +14,12 @@ const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const attribute = (markup, name) => markup.match(new RegExp(`\\b${name}=["']([^"']*)["']`, "i"))?.[1] ?? "";
 const tags = (html, name) => [...html.matchAll(new RegExp(`<${name}\\b[^>]*>`, "gi"))].map((match) => match[0]);
 const isExternal = (value) => /^(?:https?:|data:|mailto:|tel:|javascript:)/i.test(value);
+const decodeEntities = (value) => value
+  .replaceAll("&amp;", "&")
+  .replaceAll("&quot;", "\"")
+  .replaceAll("&#39;", "'")
+  .replaceAll("&lt;", "<")
+  .replaceAll("&gt;", ">");
 
 const normalizeLocalPath = (value, fallbackFile = "") => {
   const [withoutHash] = value.split("#");
@@ -115,6 +121,8 @@ const sitemap = read("sitemap.xml");
 const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 const publicFiles = sitemapUrls.map((url) => new URL(url).pathname.replace(/^\/$/, "/index.html").replace(/^\//, ""));
 const canonicalOwners = new Map();
+const titleOwners = new Map();
+const descriptionOwners = new Map();
 
 for (const file of htmlFiles) {
   const html = read(file);
@@ -128,14 +136,22 @@ for (const file of htmlFiles) {
   const h1Count = (html.match(/<h1\b/gi) || []).length;
   if (h1Count !== 1) issues.push(`${file}: public page must contain exactly one H1; found ${h1Count}`);
 
-  const title = html.match(/<title>([^<]*)<\/title>/i)?.[1].trim() ?? "";
-  const description = html.match(/<meta\b[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i)?.[1].trim() ?? "";
+  const title = decodeEntities(html.match(/<title>([^<]*)<\/title>/i)?.[1].trim() ?? "");
+  const description = decodeEntities(html.match(/<meta\b[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i)?.[1].trim() ?? "");
   const canonical = html.match(/<link\b[^>]*rel=["']canonical["'][^>]*href=["']([^"']*)["'][^>]*>/i)?.[1] ?? "";
   if (!title) issues.push(`${file}: public page missing title`);
   if (!description) issues.push(`${file}: public page missing meta description`);
   if (!canonical) issues.push(`${file}: public page missing canonical URL`);
   if (title && (title.length < 25 || title.length > 65)) warnings.push(`${file}: title length is ${title.length}`);
   if (description && (description.length < 70 || description.length > 170)) warnings.push(`${file}: meta description length is ${description.length}`);
+  if (title) {
+    if (titleOwners.has(title)) issues.push(`${file}: duplicate title also used by ${titleOwners.get(title)}`);
+    titleOwners.set(title, file);
+  }
+  if (description) {
+    if (descriptionOwners.has(description)) issues.push(`${file}: duplicate meta description also used by ${descriptionOwners.get(description)}`);
+    descriptionOwners.set(description, file);
+  }
   if (canonical) {
     if (canonicalOwners.has(canonical)) issues.push(`${file}: duplicate canonical URL also used by ${canonicalOwners.get(canonical)}`);
     canonicalOwners.set(canonical, file);

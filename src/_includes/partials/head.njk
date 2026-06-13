@@ -1,0 +1,40 @@
+    <!-- Google tag (gtag.js) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("consent", "default", {
+        "analytics_storage": "denied",
+        "ad_storage": "denied",
+        "ad_user_data": "denied",
+        "ad_personalization": "denied"
+      });
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <meta name="description" content="{{ description }}">
+    <meta name="robots" content="{{ robots }}">
+    <link rel="canonical" href="{{ canonical }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/favicon-180.png">
+    {% if pageKey == "home" %}<link rel="preload" as="image" href="{{ business.logoMedium }}" imagesrcset="{{ business.logoSmall }} 180w, {{ business.logoMedium }} 360w" imagesizes="(max-width: 560px) 72px, 96px" type="image/webp" fetchpriority="high">{% endif %}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ business.name }}">
+    <meta property="og:locale" content="{{ site.language | replace("-", "_") }}">
+    <meta property="og:url" content="{{ canonical }}">
+    <meta property="og:title" content="{{ ogTitle or title }}">
+    <meta property="og:description" content="{{ ogDescription or description }}">
+    <meta property="og:image" content="{{ (ogImage or business.defaultOgImage) | absoluteUrl(business.url) }}">
+    <meta property="og:image:secure_url" content="{{ (ogImage or business.defaultOgImage) | absoluteUrl(business.url) }}">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="{{ site.ogImageWidth }}">
+    <meta property="og:image:height" content="{{ site.ogImageHeight }}">
+    <meta property="og:image:alt" content="{{ site.ogImageAlt }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ ogTitle or title }}">
+    <meta name="twitter:description" content="{{ ogDescription or description }}">
+    <meta name="twitter:image" content="{{ (ogImage or business.defaultOgImage) | absoluteUrl(business.url) }}">
+    <meta name="twitter:image:alt" content="{{ site.ogImageAlt }}">
+    <link rel="stylesheet" href="styles.css">
+    {% include "partials/structured-data.njk" %}

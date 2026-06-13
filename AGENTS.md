@@ -315,3 +315,15 @@ Before final output, confirm the work has:
 The final answer should be clear, direct, and practical.
 
 Build code that another senior developer can open six months later and understand quickly.
+
+## Project-Specific Build Rules
+
+This repository uses Eleventy and Nunjucks.
+
+* Edit source pages and shared data under `src/`; do not manually create root HTML files.
+* Treat `_site/` as ignored generated deployment output.
+* Maintain shared business, navigation, package, FAQ, and site values in `src/_data/`.
+* Preserve current public `.html` URLs and canonical URLs.
+* Run `npm run check` after source changes; it builds and validates `_site/`.
+* Run rendered browser QA after navigation, layout, form, or interaction changes.
+* GitHub Pages and Cloudflare deploy `_site/`, not the repository root.

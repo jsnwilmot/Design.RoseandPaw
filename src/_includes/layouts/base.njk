@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="{{ site.language }}">
+  <head>
+    {% include "partials/head.njk" %}
+  </head>
+  <body data-page="{{ pageKey }}">
+    <a class="skip-link" href="#main">Skip to main content</a>
+    {% include "partials/header.njk" %}
+    {{ content | safe }}
+    {% include "partials/footer.njk" %}
+    <script src="site-config.js"></script>
+    <script src="script.js" defer></script>
+  </body>
+</html>

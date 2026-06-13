@@ -6,14 +6,11 @@ const contactForm = document.querySelector("[data-contact-form]");
 const reviewCarousel = document.querySelector("[data-review-carousel]");
 const reviewPrev = document.querySelector("[data-review-prev]");
 const reviewNext = document.querySelector("[data-review-next]");
-const packageLabels = {
-  starter: "Starter Website from $499",
-  launch: "Launch Package from $899",
-  growth: "Growth Package from $1,299",
-  complete: "Complete Brand Package from $1,799"
-};
-const googleAnalyticsId = "G-9QEQZ3X94H";
-const turnstileSiteKey = "CONFIGURE_TURNSTILE_SITE_KEY";
+const siteConfig = window.siteConfig || {};
+const packageLabels = Object.fromEntries((siteConfig.packages || []).map((item) => [item.id, item.contactValue]));
+const googleAnalyticsId = siteConfig.analyticsId || "";
+const businessEmail = siteConfig.email;
+const turnstileSiteKey = siteConfig.turnstileSiteKey || "CONFIGURE_TURNSTILE_SITE_KEY";
 const cookieConsentKey = "rosePawCookieConsent";
 let googleAnalyticsLoaded = false;
 
@@ -388,7 +385,7 @@ if (protectedForms.length > 0) {
   if (turnstileSiteKey === "CONFIGURE_TURNSTILE_SITE_KEY") {
     protectedForms.forEach((form) => {
       if (form instanceof HTMLFormElement) {
-        setProtectedFormStatus(form, "Spam protection is not configured. Please email design@roseandpaw.ca.");
+        setProtectedFormStatus(form, `Spam protection is not configured. Please email ${businessEmail}.`);
       }
     });
   } else {
@@ -420,7 +417,7 @@ if (protectedForms.length > 0) {
             "error-callback": () => {
               state.verified = false;
               state.submitButton.disabled = true;
-              setProtectedFormStatus(form, "Spam protection is unavailable. Please email design@roseandpaw.ca.");
+              setProtectedFormStatus(form, `Spam protection is unavailable. Please email ${businessEmail}.`);
             }
           });
         });
@@ -428,7 +425,7 @@ if (protectedForms.length > 0) {
       .catch(() => {
         protectedForms.forEach((form) => {
           if (form instanceof HTMLFormElement) {
-            setProtectedFormStatus(form, "Spam protection is unavailable. Please email design@roseandpaw.ca.");
+            setProtectedFormStatus(form, `Spam protection is unavailable. Please email ${businessEmail}.`);
           }
         });
       });
@@ -457,7 +454,7 @@ if (contactForm instanceof HTMLFormElement) {
         <p class="eyebrow">Request sent</p>
         <h2>Thank you. Your message has been received.</h2>
         <p>I&rsquo;ll review your project details and follow up with practical next steps.</p>
-        <p>You can also email <a href="mailto:design@roseandpaw.ca">design@roseandpaw.ca</a> if you need to add anything.</p>
+        <p>You can also email <a href="mailto:${businessEmail}">${businessEmail}</a> if you need to add anything.</p>
       </div>
     `;
 
@@ -530,7 +527,7 @@ if (contactForm instanceof HTMLFormElement) {
 
       replaceFormWithSuccess();
     } catch (error) {
-      showFormStatus("Sorry, the form could not be submitted. Please email design@roseandpaw.ca or try again.");
+      showFormStatus(`Sorry, the form could not be submitted. Please email ${businessEmail} or try again.`);
       resetTurnstile(contactForm);
 
       if (submitButton instanceof HTMLButtonElement) {

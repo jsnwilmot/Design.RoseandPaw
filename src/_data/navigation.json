@@ -1,0 +1,23 @@
+{
+  "header": [
+    { "key": "home", "label": "Home", "url": "index.html" },
+    { "key": "services", "label": "Services", "url": "services.html" },
+    { "key": "packages", "label": "Packages", "url": "packages.html" },
+    { "key": "portfolio", "label": "Portfolio", "url": "portfolio.html" },
+    { "key": "about", "label": "About", "url": "about.html" },
+    { "key": "faq", "label": "FAQ", "url": "faq.html" }
+  ],
+  "footerExplore": [
+    { "label": "Home", "url": "index.html" },
+    { "label": "About", "url": "about.html" },
+    { "label": "Services", "url": "services.html" },
+    { "label": "Packages", "url": "packages.html" },
+    { "label": "Portfolio", "url": "portfolio.html" }
+  ],
+  "footerSupport": [
+    { "label": "FAQ", "url": "faq.html" },
+    { "label": "Contact", "url": "contact.html" },
+    { "label": "Privacy Policy", "url": "privacy.html" },
+    { "label": "Terms & Service Policy", "url": "terms.html" }
+  ]
+}

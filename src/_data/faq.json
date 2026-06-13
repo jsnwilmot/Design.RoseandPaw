@@ -1,0 +1,117 @@
+[
+  {
+    "question": "What services do you offer?",
+    "answer": "Website design, SEO optimization, Google Business Profile setup and optimization, Yelp Business Profile setup and optimization, business card design, social media post design, Google Analytics support, website updates, redesign help, flyers, price lists, service menus, and other digital design services for small businesses.",
+    "open": true
+  },
+  {
+    "question": "What does SEO mean?",
+    "answer": "SEO means search engine optimization. In plain language, it is the work that helps search engines understand what your website pages are about, where your business serves customers, and which pages may be useful for related searches. It does not guarantee rankings, but it gives the site a stronger foundation.",
+    "open": false
+  },
+  {
+    "question": "Do you build websites for small businesses?",
+    "answer": "Yes. Rose & Paw Digital Designs creates custom website design for small businesses, including one-page starter sites, business websites, redesigns, and service-focused pages with clear calls to action.",
+    "open": false
+  },
+  {
+    "question": "Do you work with businesses outside of Lethbridge?",
+    "answer": "Yes. Rose & Paw Digital Designs is based in Lethbridge, Alberta and serves clients Canada-wide. Work can be handled online by appointment.",
+    "open": false
+  },
+  {
+    "question": "How much does a website cost?",
+    "answer": "Starter websites begin at $499, business websites begin at $899, Growth Package projects begin at $1,299, and Complete Brand Package projects begin at $1,799. Website redesigns start at $399 and website updates start at $60/hour.",
+    "open": false
+  },
+  {
+    "question": "What is included in a starter website?",
+    "answer": "The Starter Website includes a 1-page website, mobile-friendly layout, basic contact section, basic SEO setup, social links, and 1 round of revisions.",
+    "open": false
+  },
+  {
+    "question": "What is included in a business website?",
+    "answer": "The Launch Package includes a 3 to 5 page website, mobile-friendly design, basic SEO optimization, contact form setup, Google Business Profile setup or cleanup, and 2 rounds of revisions.",
+    "open": false
+  },
+  {
+    "question": "Do you offer website redesigns or updates?",
+    "answer": "Yes. Website redesigns start at $399, and website updates are available from $60/hour for content edits, small layout fixes, image updates, and maintenance-style changes.",
+    "open": false
+  },
+  {
+    "question": "Can you help if I already have a domain or hosting?",
+    "answer": "Yes. Existing domains and hosting can usually be used. If you do not have hosting yet, Rose & Paw Digital Designs can provide practical setup guidance for a static, GitHub Pages-friendly website.",
+    "open": false
+  },
+  {
+    "question": "Do I own my website after it is finished?",
+    "answer": "Yes. Website files and content belong to the client after final payment. Final payment is due before website launch or file delivery.",
+    "open": false
+  },
+  {
+    "question": "Will my website work on mobile phones?",
+    "answer": "Yes. Mobile-friendly website design is part of the build. Pages are designed to work on phones, tablets, laptops, and desktops without horizontal scrolling.",
+    "open": false
+  },
+  {
+    "question": "Will my website be SEO-friendly?",
+    "answer": "Yes. SEO basics are included, such as page titles, meta descriptions, headings, image alt text, internal links, local keywords, clean URLs, structured data, sitemap.xml, and robots.txt.",
+    "open": false
+  },
+  {
+    "question": "Do you guarantee Google rankings?",
+    "answer": "No. SEO basics help create a stronger foundation, but Google rankings, leads, sales, and conversions are not guaranteed.",
+    "open": false
+  },
+  {
+    "question": "Can you help with Google Business Profile setup?",
+    "answer": "Yes. Rose & Paw Digital Designs can help set up or clean up a Google Business Profile, including categories, service details, business description, contact information, and profile completeness.",
+    "open": false
+  },
+  {
+    "question": "Can you help set up a Yelp Business Profile?",
+    "answer": "Yes. Yelp Business Profile setup and optimization are available, especially for service businesses that benefit from local directory visibility.",
+    "open": false
+  },
+  {
+    "question": "Can you design business cards and provide print-ready files?",
+    "answer": "Yes. Business card design includes clean, professional layouts and print-ready design files prepared for production after final payment.",
+    "open": false
+  },
+  {
+    "question": "Can you design social media posts?",
+    "answer": "Yes. Social media post design and Facebook post design are available. Growth includes 4 social media post designs, and Complete Brand includes 8. Additional social media graphics can be quoted separately.",
+    "open": false
+  },
+  {
+    "question": "Can you create flyers, price lists, or service menus?",
+    "answer": "Yes. Flyers, price lists, service menus, promotional graphics, and related small business digital design needs can be quoted based on scope.",
+    "open": false
+  },
+  {
+    "question": "Do I need to provide my own logo, photos, or wording?",
+    "answer": "Existing logos, brand colours, photos, and wording can be used. If you do not have everything ready, Rose & Paw Digital Designs can help shape the wording and recommend suitable image options. Stock images can be used where appropriate.",
+    "open": false
+  },
+  {
+    "question": "How long does a project take?",
+    "answer": "Timelines depend on project size, content readiness, client feedback, and revision needs. A simple business card or social media set is usually faster than a multi-page website with SEO and profile work.",
+    "open": false
+  },
+  {
+    "question": "Do you require a deposit?",
+    "answer": "Deposit details can be confirmed during the quote stage. Final payment is due before website launch or file delivery.",
+    "open": false
+  },
+  {
+    "question": "How many revisions are included?",
+    "answer": "Revision rounds depend on the package: Starter includes 1, Launch and Growth include 2, and Complete Brand includes 3. Extra revisions or extra work can be quoted separately.",
+    "open": false
+  },
+  {
+    "question": "Can I request changes after launch?",
+    "answer": "Yes. Website updates are available from $60/hour, and larger post-launch changes can be quoted separately.",
+    "open": false
+  }
+]

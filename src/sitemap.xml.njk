@@ -1,0 +1,15 @@
+---
+permalink: sitemap.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{% for page in collections.all %}{% if page.data.sitemap %}
+  <url>
+    <loc>{{ page.data.canonical }}</loc>
+    <lastmod>{{ site.lastModified }}</lastmod>
+    <changefreq>{{ page.data.changefreq }}</changefreq>
+    <priority>{{ page.data.priority }}</priority>
+  </url>
+{% endif %}{% endfor %}
+</urlset>

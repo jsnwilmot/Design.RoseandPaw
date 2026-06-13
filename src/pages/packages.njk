@@ -1,0 +1,54 @@
+---
+layout: layouts/base.njk
+permalink: packages.html
+pageKey: packages
+breadcrumbName: "Packages"
+title: "Website Design Packages for Small Businesses"
+description: "Clear website design packages for small businesses, including starter websites from $499, business websites from $899, redesigns from $399, and updates from $60/hour."
+ogDescription: "Clear website design packages for small businesses, including starter websites from $499, business websites from $899, redesigns from $399, and updates from $60/hour."
+robots: "index, follow"
+canonical: "https://design.roseandpaw.ca/packages.html"
+sitemap: true
+changefreq: monthly
+priority: 0.9
+---
+<main id="main">
+      <section class="page-hero">
+        <div class="section-inner narrow">
+          <p class="eyebrow">Clear pricing. Honest recommendations.</p>
+          <h1>Website design packages for small businesses.</h1>
+          <p>Professional websites without agency-level pricing. Choose a starting point, then shape the details around the business, timeline, content, and local visibility goals.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-inner package-grid">
+          {% for package in packages %}<article class="package-card{% if package.featured %} package-card-featured{% endif %}">
+            {% if package.label %}<div class="package-label">{{ package.label }}</div>{% endif %}
+            <div class="package-topline"><span>{{ package.name }}</span><strong>{{ package.priceDisplay }}</strong></div>
+            <p class="best-for">Best for: {{ package.bestFor }}</p>
+            <ul>{% for feature in package.features %}<li>{{ feature }}</li>{% endfor %}</ul>
+            <a class="button {{ package.buttonClass }}" href="contact.html?package={{ package.id }}" data-track="quote_click">{{ package.cta }}</a>
+          </article>{% endfor %}
+        </div>
+      </section>
+
+      <section class="section section-cream">
+        <div class="section-inner split-heading">
+          <div><p class="eyebrow">Additional services</p><h2>Smaller fixes and add-ons are available too.</h2></div>
+          <div class="stacked-list">
+            <p><strong>Website redesigns from $399.</strong> Refresh outdated pages, improve mobile usability, and make the wording clearer.</p>
+            <p><strong>Website updates from $60/hour.</strong> Edit text, swap images, add sections, fix small layout issues, or update contact details.</p>
+            <p><strong>Extra revisions available by quote.</strong> Additional social media graphics, print files, or extra scope can be quoted separately.</p>
+            <p><strong>Print files provided after final payment.</strong> Final payment is due before website launch or file delivery.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-band">
+        <div class="section-inner cta-grid">
+          <div><p class="eyebrow">Not sure where to start?</p><h2>A free consultation can narrow it down.</h2><p>Share what you have now, what feels missing, and what budget range makes sense.</p></div>
+          <div class="cta-actions"><a class="button button-primary" href="contact.html" data-track="booking_click">Request a Free Consultation</a></div>
+        </div>
+      </section>
+    </main>

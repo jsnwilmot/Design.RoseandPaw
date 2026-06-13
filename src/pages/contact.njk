@@ -1,0 +1,79 @@
+---
+layout: layouts/base.njk
+permalink: contact.html
+pageKey: contact
+breadcrumbName: "Contact"
+title: "Contact Rose & Paw Digital Designs"
+description: "Contact Rose & Paw Digital Designs for a free consultation about website design, basic SEO setup, business profiles, business cards, social media graphics, or digital design."
+ogDescription: "Contact Rose & Paw Digital Designs for a free consultation about website design, basic SEO setup, business profiles, business cards, social media graphics, or digital design."
+robots: "index, follow"
+canonical: "https://design.roseandpaw.ca/contact.html"
+sitemap: true
+changefreq: monthly
+priority: 0.9
+---
+<main id="main">
+      <section class="page-hero">
+        <div class="section-inner narrow">
+          <p class="eyebrow">Request a free consultation</p>
+          <h1>Tell Rose &amp; Paw Digital Designs what your business needs next.</h1>
+          <p>Call, email, use the form, or message on Facebook for website design, basic SEO setup, business profile setup, business cards, social media graphics, or website updates.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-inner contact-page-grid">
+          <div class="contact-card">
+            <h2>Contact details</h2>
+            <dl>
+              <div><dt>Phone</dt><dd><a href="tel:{{ business.telephoneHref }}" data-track="phone_click">{{ business.telephone }}</a></dd></div>
+              <div><dt>Email</dt><dd><a href="mailto:{{ business.email }}" data-track="email_click">{{ business.email }}</a></dd></div>
+              <div><dt>Location</dt><dd>Based in Lethbridge, Alberta</dd></div>
+              <div><dt>Service area</dt><dd>Canada-wide</dd></div>
+              <div><dt>Hours</dt><dd>By appointment only</dd></div>
+              <div><dt>Facebook</dt><dd><a href="{{ business.facebookUrl }}" target="_blank" rel="noopener noreferrer" data-track="facebook_click">fb.com/roseandpawdesigns</a></dd></div>
+            </dl>
+            <p class="contact-note">Based in Lethbridge, Alberta. Service area: Canada-wide.</p>
+          </div>
+
+          <form action="https://api.web3forms.com/submit" method="POST" class="quote-form" data-contact-form data-protected-form>
+            <input type="hidden" name="access_key" value="225df1dc-443f-4d80-8162-1d63333d4bda">
+            <input type="hidden" name="subject" value="New quote request from Rose & Paw Digital Designs website">
+            <input type="hidden" name="from_name" value="Rose & Paw Digital Designs Website">
+            <h2>Project inquiry</h2>
+            <p>Share a few details about your business and what you need. I&rsquo;ll review it and follow up with practical next steps.</p>
+            <div class="form-grid">
+              <label>Name <input name="name" autocomplete="name" required></label>
+              <label>Business name <input name="business_name" autocomplete="organization"></label>
+              <label>Email <input type="email" name="email" autocomplete="email" required></label>
+              <label>Phone <input type="tel" name="phone" autocomplete="tel"></label>
+              <label>Service needed
+                <select name="service_needed" required>
+                  <option value="">Select a service</option>
+                  <option>Website design</option>
+                  <option>SEO optimization</option>
+                  <option>Google Business Profile setup</option>
+                  <option>Yelp Business Profile setup</option>
+                  <option>Business card design</option>
+                  <option>Social media post design</option>
+                  <option>Website updates</option>
+                  <option>Other digital design</option>
+                </select>
+              </label>
+              <label>Budget or package interest
+                <select name="budget_or_package_interest">
+                  <option value="">Not sure yet</option>
+                  {% for package in packages %}<option>{{ package.contactValue }}</option>{% endfor %}
+                  <option>Website redesign from $399</option>
+                  <option>Website updates from $60/hour</option>
+                </select>
+              </label>
+            </div>
+            <label>Message <textarea name="message" rows="6" required></textarea></label>
+            <div class="turnstile-container" data-turnstile tabindex="-1" role="group" aria-label="Spam protection"></div>
+            <p class="form-status" data-form-status aria-live="polite"></p>
+            <button class="button button-primary" type="submit">Request a Free Consultation</button>
+          </form>
+        </div>
+      </section>
+    </main>

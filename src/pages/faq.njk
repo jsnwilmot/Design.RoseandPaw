@@ -1,0 +1,31 @@
+---
+layout: layouts/base.njk
+permalink: faq.html
+pageKey: faq
+breadcrumbName: "FAQ"
+title: "Website Design and SEO FAQ for Small Businesses"
+description: "Answers about small business website design, SEO basics, Google Business Profile setup, Yelp optimization, business cards, social media graphics, pricing, ownership, and timelines."
+ogDescription: "Answers about small business website design, SEO basics, Google Business Profile setup, Yelp optimization, business cards, social media graphics, pricing, ownership, and timelines."
+robots: "index, follow"
+canonical: "https://design.roseandpaw.ca/faq.html"
+sitemap: true
+changefreq: monthly
+priority: 0.8
+---
+<main id="main">
+      <section class="page-hero">
+        <div class="section-inner narrow">
+          <p class="eyebrow">Website design and SEO FAQ</p>
+          <h1>Plain answers before you request a quote.</h1>
+          <p>Clear details about services, pricing, search engine optimization (SEO), business profiles, ownership, revisions, timelines, and what Rose &amp; Paw Digital Designs needs from you to build well.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-inner faq-list">
+          {% for item in faq %}<details{% if item.open %} open{% endif %}><summary>{{ item.question }}</summary><p>{{ item.answer }}</p></details>{% endfor %}
+        </div>
+      </section>
+
+      <section class="cta-band"><div class="section-inner cta-grid"><div><p class="eyebrow">Still deciding?</p><h2>Ask the practical questions first.</h2><p>A free consultation can help sort out package fit, timeline, content, profile work, and what should wait.</p></div><div class="cta-actions"><a class="button button-primary" href="contact.html" data-track="booking_click">Request a Free Consultation</a></div></div></section>
+    </main>

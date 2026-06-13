@@ -1,0 +1,23 @@
+    <footer class="site-footer">
+      <div class="section-inner footer-grid">
+        <div class="footer-column footer-column-brand">
+          <a class="footer-brand" href="index.html"><img src="{{ business.logoSmall }}" srcset="{{ business.logoSmall }} 180w, {{ business.logoMedium }} 360w" sizes="42px" width="54" height="55" loading="lazy" decoding="async" alt=""><span>{{ business.name }}</span></a>
+          <p class="footer-description">Based in {{ business.locality }}, {{ business.region }}. Originally from Vancouver Island, now serving small businesses {{ business.serviceAreaDisplay }}.</p>
+        </div>
+        <nav class="footer-column" aria-labelledby="footer-explore-title">
+          <h2 class="footer-heading" id="footer-explore-title">Explore</h2>
+          <ul class="footer-links">{% for item in navigation.footerExplore %}<li><a href="{{ item.url }}">{{ item.label }}</a></li>{% endfor %}</ul>
+        </nav>
+        <nav class="footer-column" aria-labelledby="footer-support-title">
+          <h2 class="footer-heading" id="footer-support-title">Support</h2>
+          <ul class="footer-links">{% for item in navigation.footerSupport %}<li><a href="{{ item.url }}">{{ item.label }}</a></li>{% endfor %}</ul>
+        </nav>
+        <div class="footer-column footer-contact">
+          <h2 class="footer-heading">Contact</h2>
+          <address class="footer-address"><a href="tel:{{ business.telephoneHref }}" data-track="phone_click">Phone: {{ business.telephone }}</a><a href="mailto:{{ business.email }}" data-track="email_click">Email: {{ business.email }}</a></address>
+          <a href="{{ business.facebookUrl }}" target="_blank" rel="noopener noreferrer" data-track="facebook_click">Facebook</a>
+          <a class="footer-cta" href="contact.html" data-track="quote_click">Request a Quote</a>
+        </div>
+      </div>
+      <div class="section-inner footer-bottom"><button class="cookie-settings-button" type="button" data-cookie-settings aria-label="Open cookie settings">Cookie settings</button><p>&copy; <span data-year>2026</span> {{ business.name }}. All rights reserved.</p></div>
+    </footer>
