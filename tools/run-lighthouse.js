@@ -17,7 +17,8 @@ const pages = [
   ["faq", "/faq.html"],
   ["contact", "/contact.html"],
   ["privacy", "/privacy.html"],
-  ["terms", "/terms.html"]
+  ["terms", "/terms.html"],
+  ["website-audit", "/website-audit/"]
 ];
 const chromeFlags = [
   "--headless=new",

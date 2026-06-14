@@ -1,0 +1,121 @@
+---
+layout: layouts/base.njk
+permalink: website-audit/index.html
+baseHref: "/"
+pageKey: website-audit
+breadcrumbName: "Free Website Audit"
+title: "Free Website Audit | Rose & Paw Digital Designs"
+description: "Run a free Lighthouse website audit for performance, accessibility, SEO, and best practices. Get clear recommendations from Rose & Paw Digital Designs."
+ogDescription: "Run a free Lighthouse website audit for performance, accessibility, SEO, and best practices. Get clear recommendations from Rose & Paw Digital Designs."
+robots: "index, follow"
+canonical: "https://design.roseandpaw.ca/website-audit/"
+sitemap: true
+changefreq: monthly
+priority: 0.8
+hasCaptcha: true
+auditScript: true
+---
+<main id="main">
+  <section class="page-hero audit-hero">
+    <div class="section-inner narrow">
+      <p class="eyebrow">Automated Lighthouse starting point</p>
+      <h1>Free Website Audit</h1>
+      <p>Check one public webpage for performance, accessibility, best practices, and SEO using Google Lighthouse. You will receive a clear automated report with practical recommendations.</p>
+      <p>This is a useful starting point, not a complete manual website audit.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="audit-form-title">
+    <div class="section-inner audit-layout">
+      <div>
+        <p class="eyebrow">Run your report</p>
+        <h2 id="audit-form-title">See what Lighthouse finds.</h2>
+        <p>Enter a public webpage such as your homepage. Mobile is selected by default because many customers browse from a phone.</p>
+      </div>
+
+      <form class="audit-form" data-audit-form>
+        <label for="audit-url">Public website URL</label>
+        <input id="audit-url" name="url" type="text" inputmode="url" autocomplete="url" placeholder="example.com or https://example.com" maxlength="2048" required>
+
+        <fieldset class="audit-strategy">
+          <legend>Audit device</legend>
+          <label><input type="radio" name="strategy" value="mobile" checked> Mobile</label>
+          <label><input type="radio" name="strategy" value="desktop"> Desktop</label>
+        </fieldset>
+
+        <label class="audit-honeypot" aria-hidden="true">Company website <input name="company_website" tabindex="-1" autocomplete="off"></label>
+        <p class="form-status" data-audit-status aria-live="polite" tabindex="-1"></p>
+        <div class="audit-loading" data-audit-loading role="status" aria-live="polite" hidden>
+          <span class="audit-spinner" aria-hidden="true"></span>
+          <span>The Lighthouse audit is running. Please keep this page open.</span>
+        </div>
+        <button class="button button-primary" type="submit">Run Free Audit</button>
+        <p class="audit-privacy-note">The submitted URL is sent to Google PageSpeed Insights and may be temporarily cached to reduce duplicate requests. Do not submit passwords or private URLs.</p>
+      </form>
+    </div>
+  </section>
+
+  <section class="section section-cream audit-results" data-audit-results tabindex="-1" aria-labelledby="audit-results-title" hidden>
+    <div class="section-inner">
+      <div class="section-heading">
+        <p class="eyebrow">Automated report</p>
+        <h2 id="audit-results-title" tabindex="-1">Lighthouse audit results</h2>
+      </div>
+      <dl class="audit-result-meta">
+        <div><dt>Page tested</dt><dd data-result-url></dd></div>
+        <div><dt>Device</dt><dd data-result-strategy></dd></div>
+        <div><dt>Audit date</dt><dd data-result-date></dd></div>
+        <div><dt>Report source</dt><dd data-result-cache></dd></div>
+      </dl>
+      <div class="audit-score-grid" data-score-grid></div>
+
+      <section class="audit-result-section" data-metrics-section aria-labelledby="audit-metrics-title">
+        <h2 id="audit-metrics-title">Performance metrics</h2>
+        <div class="audit-metric-grid" data-metric-grid></div>
+      </section>
+
+      <section class="audit-result-section" aria-labelledby="audit-findings-title">
+        <h2 id="audit-findings-title">Priority findings</h2>
+        <div class="audit-findings" data-findings></div>
+      </section>
+
+      <aside class="audit-limitation" aria-labelledby="audit-limitation-title">
+        <h2 id="audit-limitation-title">What this report covers</h2>
+        <p>This automated report reviews one public webpage using Google Lighthouse. It is a useful starting point, but it is not a complete manual website, accessibility, SEO, security, design, content, or conversion audit.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="audit-help-title">
+    <div class="section-inner audit-help-layout">
+      <div>
+        <p class="eyebrow">Practical next steps</p>
+        <h2 id="audit-help-title">Would you like help improving these results?</h2>
+        <p>Run the audit first, then send the summary with your contact details. Contact details are collected only when you request help.</p>
+        <p>You can also <a href="contact.html">request a general consultation</a>.</p>
+      </div>
+      <form action="https://api.web3forms.com/submit" method="POST" class="quote-form audit-help-form" data-audit-help-form data-captcha-form>
+        <input type="hidden" name="access_key" value="225df1dc-443f-4d80-8162-1d63333d4bda">
+        <input type="hidden" name="subject" value="Website audit help request">
+        <input type="hidden" name="from_name" value="Rose & Paw Digital Designs Website Audit">
+        <input type="hidden" name="website_url">
+        <input type="hidden" name="audit_strategy">
+        <input type="hidden" name="audit_date">
+        <input type="hidden" name="performance_score">
+        <input type="hidden" name="accessibility_score">
+        <input type="hidden" name="best_practices_score">
+        <input type="hidden" name="seo_score">
+        <input type="hidden" name="top_findings">
+        <div class="form-grid">
+          <label>Name <input name="name" autocomplete="name" required></label>
+          <label>Email <input type="email" name="email" autocomplete="email" required></label>
+        </div>
+        <label>Audit summary <textarea name="audit_summary" rows="7" readonly>Run an audit to add the report summary.</textarea></label>
+        <label>Optional message <textarea name="message" rows="5"></textarea></label>
+        <div class="h-captcha" data-captcha="true"></div>
+        <p class="form-status" data-form-status aria-live="polite" tabindex="-1"></p>
+        <button class="button button-primary" type="submit" disabled>Request Help With These Results</button>
+      </form>
+    </div>
+  </section>
+</main>

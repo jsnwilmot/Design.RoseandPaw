@@ -11,6 +11,7 @@ const types = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".xml": "application/xml; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
@@ -50,8 +51,8 @@ const resolveRequestPath = (urlPathname) => {
     return { error: 400 };
   }
 
-  if (pathname === "/") {
-    pathname = "/index.html";
+  if (pathname.endsWith("/")) {
+    pathname += "index.html";
   }
 
   const filePath = path.resolve(rootDir, `.${pathname}`);

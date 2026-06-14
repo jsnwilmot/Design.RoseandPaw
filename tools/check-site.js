@@ -4,7 +4,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const rootDir = path.resolve(process.env.SITE_DIR || path.join(process.cwd(), "_site"));
-const htmlFiles = fs.readdirSync(rootDir).filter((file) => file.endsWith(".html")).sort();
+const listFiles = (directory, prefix = "") => fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+  const relativePath = path.posix.join(prefix, entry.name);
+  return entry.isDirectory() ? listFiles(path.join(directory, entry.name), relativePath) : [relativePath];
+});
+const htmlFiles = listFiles(rootDir).filter((file) => file.endsWith(".html")).sort();
 const issues = [];
 const warnings = [];
 
@@ -119,7 +123,8 @@ const checkAccessibility = (file, html) => {
 
 const captchaPages = new Map([
   ["contact.html", "225df1dc-443f-4d80-8162-1d63333d4bda"],
-  ["client-intake.html", "9786a91c-c3fd-4b9e-ad2d-3d55ec5807d5"]
+  ["client-intake.html", "9786a91c-c3fd-4b9e-ad2d-3d55ec5807d5"],
+  ["website-audit/index.html", "225df1dc-443f-4d80-8162-1d63333d4bda"]
 ]);
 
 const checkCaptchaForm = (file, html) => {
@@ -156,7 +161,10 @@ const checkCaptchaForm = (file, html) => {
 
 const sitemap = read("sitemap.xml");
 const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-const publicFiles = sitemapUrls.map((url) => new URL(url).pathname.replace(/^\/$/, "/index.html").replace(/^\//, ""));
+const publicFiles = sitemapUrls.map((url) => {
+  const pathname = new URL(url).pathname;
+  return `${pathname}${pathname.endsWith("/") ? "index.html" : ""}`.replace(/^\//, "");
+});
 const canonicalOwners = new Map();
 const titleOwners = new Map();
 const descriptionOwners = new Map();
@@ -207,6 +215,13 @@ for (const pattern of [
 }
 if (!/h-captcha-response/i.test(browserScript)) issues.push("script.js: missing hCaptcha response validation");
 if (!/Please complete the spam protection check\./i.test(browserScript)) issues.push("script.js: missing accessible CAPTCHA error message");
+
+const auditScript = read("audit.js");
+if (/\bturnstile\b|PAGESPEED_API_KEY|AIza[0-9A-Za-z_-]{20,}/i.test(auditScript)) {
+  issues.push("audit.js: contains a prohibited CAPTCHA reference or server-side API key");
+}
+if (!/\/api\/website-audit/i.test(read("site-config.js"))) issues.push("site-config.js: missing website audit endpoint");
+if (/PAGESPEED_API_KEY|AIza[0-9A-Za-z_-]{20,}/i.test(read("site-config.js"))) issues.push("site-config.js: exposes a PageSpeed API key");
 
 for (const [url, file] of sitemapUrls.map((url, index) => [url, publicFiles[index]])) {
   if (!exists(file)) issues.push(`sitemap.xml: URL does not map to an existing file: ${url}`);

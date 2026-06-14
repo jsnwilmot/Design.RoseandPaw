@@ -4,6 +4,9 @@
     "build": "eleventy",
     "serve": "npm run build && node tools/serve-static.js",
     "check": "npm run build && node tools/check-site.js",
+    "test": "node --test",
+    "check:worker": "npx --yes wrangler@4.100.0 deploy --dry-run",
+    "deploy:audit-worker": "npx --yes wrangler@4.100.0 deploy",
     "lighthouse": "npm run build && node tools/run-lighthouse.js",
     "lighthouse:report": "npm run lighthouse",
     "optimize:images": "node tools/optimize-images.js"

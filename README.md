@@ -20,6 +20,8 @@ src/
 images/                  Public delivery-ready images, copied to _site/images
 _source-assets/          Original/editable assets retained in Git, never deployed
 tools/                   Validation, local server, Lighthouse, and image tools
+worker/                  Cloudflare Worker for the secure website-audit API
+test/                    Node test suite for audit security and normalization
 reports/                 Ignored generated reports; only reports/.gitignore is tracked
 _site/                   Ignored generated deployment output
 ```
@@ -52,6 +54,8 @@ npm ci
 npm run dev
 npm run build
 npm run check
+npm test
+npm run check:worker
 npm run lighthouse
 npm run optimize:images
 ```
@@ -59,6 +63,8 @@ npm run optimize:images
 - `npm run dev`: Eleventy development server with rebuilds
 - `npm run build`: generate `_site/`
 - `npm run check`: build, then validate the generated site
+- `npm test`: run the audit endpoint, URL validation, caching, normalization, and client-helper tests
+- `npm run check:worker`: validate and bundle the Cloudflare Worker without deploying it
 - `npm run lighthouse`: build, then audit all public pages and write ignored reports
 - `npm run optimize:images`: optional source image optimization helper
 
@@ -77,13 +83,14 @@ The build preserves:
 - `/contact.html`
 - `/privacy.html`
 - `/terms.html`
+- `/website-audit/`
 - `/client-intake.html`
 - `/thank-you.html`
 - `/404.html`
 - `/robots.txt`
 - `/sitemap.xml`
 
-Only the nine indexable public pages are generated into `sitemap.xml`. Client intake, thank-you, and 404 pages remain excluded.
+Only the ten indexable public pages are generated into `sitemap.xml`. Client intake, thank-you, and 404 pages remain excluded.
 
 ## Forms And Browser Configuration
 
@@ -92,6 +99,41 @@ Forms use Web3Forms with its zero-configuration hCaptcha integration. The public
 Select hCaptcha for each form in the Web3Forms dashboard. Web3Forms supplies the hCaptcha configuration, so this repository does not require a CAPTCHA site key or secret. Cloudflare Turnstile is not used because Web3Forms requires a paid plan for that integration.
 
 Google Analytics 4 uses the Measurement ID in `src/_data/business.json` and loads only after analytics consent. Advertising storage, user data, and personalization remain denied.
+
+## Free Website Audit
+
+`/website-audit/` submits a public webpage URL to the route-scoped Cloudflare Worker at `/api/website-audit`. The Worker calls Google PageSpeed Insights, requests the performance, accessibility, best-practices, and SEO Lighthouse categories, and returns only a normalized report used by the browser interface.
+
+The API:
+
+- accepts only same-origin JSON `POST` requests up to 4 KiB
+- normalizes domains without a protocol to HTTPS
+- rejects localhost, embedded credentials, malformed hosts, private/loopback/link-local IPv4 and IPv6 ranges, unsupported protocols, control characters, and excessive URL lengths
+- never downloads or renders the submitted page directly
+- rate-limits new reports by connecting IP through a Cloudflare Workers Rate Limiting binding
+- caches successful reports by normalized URL and strategy for 30 minutes using the Workers Cache API
+- applies a 60-second PageSpeed request timeout and returns safe error codes
+- keeps the PageSpeed API key in a Cloudflare secret
+
+The request-for-help form uses the existing Web3Forms access-key pattern and free-plan hCaptcha integration. It sends a concise audit summary, not raw Lighthouse JSON.
+
+### Audit Environment
+
+Create a Google Cloud API key with PageSpeed Insights API access, then add it as a Cloudflare Worker secret:
+
+```bash
+npx wrangler secret put PAGESPEED_API_KEY
+```
+
+For local Worker API development, copy `.dev.vars.example` to `.dev.vars` and replace the placeholder:
+
+```bash
+npx wrangler dev
+```
+
+`ALLOWED_ORIGIN`, the 30-minute cache TTL, route, and rate-limit binding are non-secret values in `wrangler.jsonc`. Do not add PageSpeed keys to Eleventy data, browser JavaScript, generated files, or GitHub variables.
+
+The existing hCaptcha integration does not require a repository environment variable. Keep hCaptcha selected for the website-audit help form in the Web3Forms dashboard.
 
 ## SEO And Structured Data
 
@@ -128,6 +170,20 @@ For Cloudflare Pages:
 
 `CNAME`, `robots.txt`, public images, `styles.css`, and browser scripts are copied into `_site/` during the build. `_source-assets/`, `_site/`, reports, and development files are not deployed.
 
+### Website Audit Worker Deployment
+
+The current static GitHub Pages deployment remains unchanged. The separate `rose-and-paw-website-audit` Worker is routed only to `design.roseandpaw.ca/api/website-audit`, so the rest of the website continues to be served by the existing static deployment.
+
+Before the first Worker deployment:
+
+1. Confirm `design.roseandpaw.ca` traffic is proxied through Cloudflare so the Worker route can intercept `/api/website-audit`.
+2. Create and restrict a Google PageSpeed Insights API key.
+3. Run `npx wrangler secret put PAGESPEED_API_KEY`.
+4. Run `npm test`, `npm run check`, and `npm run check:worker`.
+5. Deploy with `npm run deploy:audit-worker`.
+
+The manual `.github/workflows/deploy-audit-worker.yml` workflow requires repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The Cloudflare API token must have the minimum permissions needed to deploy the Worker and route. The PageSpeed key remains a Worker secret in Cloudflare and is not stored in GitHub.
+
 ## Maintenance Rules
 
 - Preserve current public URLs and canonical URLs.
@@ -143,4 +199,5 @@ For Cloudflare Pages:
 ## Known Limitations
 
 - Successful Web3Forms and hCaptcha delivery requires the corresponding Web3Forms dashboard configuration and live third-party service access, so it cannot be fully proven by local static checks.
+- Website audit results depend on Google PageSpeed Insights availability and quota. Lighthouse lab results cover one public webpage and are not a complete manual audit or real-user performance report.
 - Lighthouse scores depend on the local browser and machine.

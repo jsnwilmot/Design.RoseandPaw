@@ -13,5 +13,8 @@
     {% endif %}
     <script src="site-config.js"></script>
     <script src="script.js" defer></script>
+    {% if auditScript %}
+    <script src="audit.js" type="module"></script>
+    {% endif %}
   </body>
 </html>

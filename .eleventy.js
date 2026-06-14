@@ -2,6 +2,8 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ images: "images" });
   eleventyConfig.addPassthroughCopy("styles.css");
   eleventyConfig.addPassthroughCopy("script.js");
+  eleventyConfig.addPassthroughCopy("audit.js");
+  eleventyConfig.addPassthroughCopy("audit-client-utils.mjs");
   eleventyConfig.addPassthroughCopy("robots.txt");
   eleventyConfig.addPassthroughCopy("CNAME");
 

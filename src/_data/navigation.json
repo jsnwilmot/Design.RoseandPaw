@@ -15,6 +15,7 @@
     { "label": "Portfolio", "url": "portfolio.html" }
   ],
   "footerSupport": [
+    { "label": "Free Website Audit", "url": "website-audit/" },
     { "label": "FAQ", "url": "faq.html" },
     { "label": "Contact", "url": "contact.html" },
     { "label": "Privacy Policy", "url": "privacy.html" },
