@@ -1664,8 +1664,57 @@ textarea {
   color: #336c45;
 }
 
+.captcha-shell {
+  min-height: 8.5rem;
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.captcha-status,
+.captcha-error-actions p,
+.captcha-noscript {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.captcha-shell[data-captcha-state="error"] .captcha-status,
+.captcha-noscript {
+  color: #8b2d1a;
+}
+
+.captcha-error-actions {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+.captcha-error-actions[hidden] {
+  display: none;
+}
+
+.captcha-error-actions a,
+.captcha-noscript a {
+  color: var(--bronze);
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .h-captcha {
   min-height: 78px;
+  max-width: 100%;
+}
+
+@media (max-width: 359px) {
+  .h-captcha {
+    width: 125%;
+    max-width: none;
+    margin-bottom: -1rem;
+    transform: scale(0.8);
+    transform-origin: top left;
+  }
 }
 
 .form-success {

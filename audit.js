@@ -232,12 +232,19 @@ if (helpForm instanceof HTMLFormElement) {
     event.preventDefault();
     const formStatus = helpForm.querySelector("[data-form-status]");
     const submitButton = helpForm.querySelector('button[type="submit"]');
-    const captchaResponse = helpForm.querySelector('[name="h-captcha-response"]')?.value || "";
 
     if (!currentReport) {
       setStatus(formStatus, "Run an audit before requesting help with the results.", "error", true);
       return;
     }
+    const captchaReady = window.captchaLoader && typeof window.captchaLoader.loadForForm === "function"
+      ? await window.captchaLoader.loadForForm(helpForm)
+      : false;
+    if (!captchaReady) {
+      setStatus(formStatus, "Spam protection could not load. Retry the check or use the contact page.", "error", true);
+      return;
+    }
+    const captchaResponse = helpForm.querySelector('[name="h-captcha-response"]')?.value || "";
     if (!captchaResponse) {
       setStatus(formStatus, "Complete the spam protection check before sending your request.", "error", true);
       return;

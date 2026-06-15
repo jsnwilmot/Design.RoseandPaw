@@ -9,7 +9,7 @@
     {{ content | safe }}
     {% include "partials/footer.njk" %}
     {% if hasCaptcha %}
-    <script src="https://web3forms.com/client/script.js" async defer></script>
+    <script src="captcha-loader.mjs" type="module"></script>
     {% endif %}
     <script src="site-config.js"></script>
     <script src="script.js" defer></script>

@@ -129,19 +129,28 @@ const captchaPages = new Map([
 
 const checkCaptchaForm = (file, html) => {
   const captchaScriptCount = (html.match(/https:\/\/web3forms\.com\/client\/script\.js/gi) || []).length;
+  const captchaLoaderCount = (html.match(/<script\b[^>]*\bsrc=["']captcha-loader\.mjs["'][^>]*>/gi) || []).length;
   const expectedAccessKey = captchaPages.get(file);
 
   if (!expectedAccessKey) {
     if (captchaScriptCount > 0) issues.push(`${file}: Web3Forms CAPTCHA script must only load on CAPTCHA form pages`);
+    if (captchaLoaderCount > 0) issues.push(`${file}: CAPTCHA loader must only load on CAPTCHA form pages`);
     return;
   }
 
-  if (captchaScriptCount !== 1) issues.push(`${file}: expected exactly one Web3Forms CAPTCHA script; found ${captchaScriptCount}`);
+  if (captchaScriptCount !== 0) issues.push(`${file}: Web3Forms CAPTCHA script must not load during initial rendering`);
+  if (captchaLoaderCount !== 1) issues.push(`${file}: expected exactly one delayed CAPTCHA loader; found ${captchaLoaderCount}`);
   if ((html.match(/\bclass=["'][^"']*\bh-captcha\b[^"']*["']/gi) || []).length !== 1) {
     issues.push(`${file}: expected exactly one hCaptcha container`);
   }
   if (!/\bdata-captcha=["']true["']/i.test(html)) issues.push(`${file}: hCaptcha container missing data-captcha="true"`);
   if (!/\bdata-captcha-form\b/i.test(html)) issues.push(`${file}: form missing data-captcha-form`);
+  if (!/\bdata-captcha-shell\b/i.test(html)) issues.push(`${file}: form missing reserved CAPTCHA shell`);
+  if (!/\bdata-captcha-status\b[^>]*\baria-live=["']polite["']/i.test(html)) issues.push(`${file}: CAPTCHA status must be a polite live region`);
+  if (!/\bdata-captcha-retry\b/i.test(html)) issues.push(`${file}: CAPTCHA error state missing retry control`);
+  if (!/<noscript>[\s\S]*JavaScript is required for spam-protected form submission/i.test(html)) {
+    issues.push(`${file}: CAPTCHA form missing no-JavaScript fallback guidance`);
+  }
   if (!new RegExp(`\\bname=["']access_key["'][^>]*\\bvalue=["']${escapeRegex(expectedAccessKey)}["']`, "i").test(html)) {
     issues.push(`${file}: Web3Forms access key changed or is missing`);
   }
@@ -215,6 +224,12 @@ for (const pattern of [
 }
 if (!/h-captcha-response/i.test(browserScript)) issues.push("script.js: missing hCaptcha response validation");
 if (!/Please complete the spam protection check\./i.test(browserScript)) issues.push("script.js: missing accessible CAPTCHA error message");
+
+const captchaLoader = read("captcha-loader.mjs");
+if (!/https:\/\/web3forms\.com\/client\/script\.js/i.test(captchaLoader)) issues.push("captcha-loader.mjs: missing Web3Forms CAPTCHA client URL");
+if (!/\bIntersectionObserver\b/i.test(captchaLoader)) issues.push("captcha-loader.mjs: missing viewport-proximity loading");
+if (!/\bdata-captcha-retry\b/i.test(captchaLoader)) issues.push("captcha-loader.mjs: missing CAPTCHA retry behavior");
+if (/PAGESPEED_API_KEY|AIza[0-9A-Za-z_-]{20,}/i.test(captchaLoader)) issues.push("captcha-loader.mjs: exposes a server-side API key");
 
 const auditScript = read("audit.js");
 if (/\bturnstile\b|PAGESPEED_API_KEY|AIza[0-9A-Za-z_-]{20,}/i.test(auditScript)) {

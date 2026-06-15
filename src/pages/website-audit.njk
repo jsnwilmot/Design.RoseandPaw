@@ -94,7 +94,7 @@ auditScript: true
         <p>Run the audit first, then send the summary with your contact details. Contact details are collected only when you request help.</p>
         <p>You can also <a href="contact.html">request a general consultation</a>.</p>
       </div>
-      <form action="https://api.web3forms.com/submit" method="POST" class="quote-form audit-help-form" data-audit-help-form data-captcha-form>
+      <form action="https://api.web3forms.com/submit" method="POST" class="quote-form audit-help-form" data-audit-help-form data-captcha-form aria-describedby="audit-help-captcha-status">
         <input type="hidden" name="access_key" value="225df1dc-443f-4d80-8162-1d63333d4bda">
         <input type="hidden" name="subject" value="Website audit help request">
         <input type="hidden" name="from_name" value="Rose & Paw Digital Designs Website Audit">
@@ -112,7 +112,8 @@ auditScript: true
         </div>
         <label>Audit summary <textarea name="audit_summary" rows="7" readonly>Run an audit to add the report summary.</textarea></label>
         <label>Optional message <textarea name="message" rows="5"></textarea></label>
-        <div class="h-captcha" data-captcha="true"></div>
+        {% set captchaId = "audit-help-captcha" %}
+        {% include "partials/captcha.njk" %}
         <p class="form-status" data-form-status aria-live="polite" tabindex="-1"></p>
         <button class="button button-primary" type="submit" disabled>Request Help With These Results</button>
       </form>

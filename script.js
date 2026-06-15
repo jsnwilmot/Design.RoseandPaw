@@ -331,6 +331,18 @@ const requireCaptchaResponse = (form) => {
   return false;
 };
 
+const ensureCaptchaReady = async (form) => {
+  if (window.captchaLoader && typeof window.captchaLoader.loadForForm === "function") {
+    const isReady = await window.captchaLoader.loadForForm(form);
+    if (isReady) {
+      return true;
+    }
+  }
+
+  setFormStatus(form, "Spam protection could not load. Retry the check or use the contact options shown with the form.", "error", true);
+  return false;
+};
+
 const resetCaptcha = () => {
   try {
     if (window.hcaptcha && typeof window.hcaptcha.reset === "function") {
@@ -342,14 +354,17 @@ const resetCaptcha = () => {
 };
 
 captchaForms.forEach((form) => {
-  if (!(form instanceof HTMLFormElement) || form.hasAttribute("data-contact-form")) {
+  if (!(form instanceof HTMLFormElement) || form.hasAttribute("data-contact-form") || form.hasAttribute("data-audit-help-form")) {
     return;
   }
 
-  form.addEventListener("submit", (event) => {
-    if (!requireCaptchaResponse(form)) {
+  form.addEventListener("submit", async (event) => {
+    if (!getCaptchaResponse(form)) {
       event.preventDefault();
       event.stopImmediatePropagation();
+      if (await ensureCaptchaReady(form)) {
+        requireCaptchaResponse(form);
+      }
       return;
     }
 
@@ -435,7 +450,7 @@ if (contactForm instanceof HTMLFormElement) {
       return;
     }
 
-    if (!requireCaptchaResponse(contactForm)) {
+    if (!await ensureCaptchaReady(contactForm) || !requireCaptchaResponse(contactForm)) {
       return;
     }
 

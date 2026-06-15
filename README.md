@@ -94,7 +94,7 @@ Only the ten indexable public pages are generated into `sitemap.xml`. Client int
 
 ## Forms And Browser Configuration
 
-Forms use Web3Forms with its zero-configuration hCaptcha integration. The public quote form submits with JavaScript and displays inline success; its non-JavaScript fallback submits directly to Web3Forms. The unlisted client intake form redirects to `/thank-you.html`.
+Forms use Web3Forms with its zero-configuration hCaptcha integration. Protected form pages load the shared local CAPTCHA loader immediately, but delay the Web3Forms and hCaptcha third-party scripts until the form approaches the viewport or receives user interaction. The public quote form submits with JavaScript and displays inline success. Without JavaScript, the forms provide direct email and phone alternatives. The unlisted client intake form redirects to `/thank-you.html`.
 
 Select hCaptcha for each form in the Web3Forms dashboard. Web3Forms supplies the hCaptcha configuration, so this repository does not require a CAPTCHA site key or secret. Cloudflare Turnstile is not used because Web3Forms requires a paid plan for that integration.
 

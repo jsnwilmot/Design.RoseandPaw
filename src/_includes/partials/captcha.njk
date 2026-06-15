@@ -1,0 +1,12 @@
+<div class="captcha-shell" data-captcha-shell data-captcha-state="idle">
+  <p id="{{ captchaId }}-status" class="captcha-status" data-captcha-status aria-live="polite">Spam protection will load when you begin using this form.</p>
+  <div class="h-captcha" data-captcha="true"></div>
+  <div class="captcha-error-actions" data-captcha-error hidden>
+    <button class="button button-secondary captcha-retry" type="button" data-captcha-retry>Retry spam protection</button>
+    <p>You can also contact us by <a href="mailto:{{ business.email }}">{{ business.email }}</a> or <a href="tel:{{ business.telephoneHref }}">{{ business.telephone }}</a>.</p>
+  </div>
+</div>
+<noscript>
+  <style>[data-captcha-form] button[type="submit"] { display: none; }</style>
+  <p class="captcha-noscript">JavaScript is required for spam-protected form submission. Please contact us by <a href="mailto:{{ business.email }}">email</a> or <a href="tel:{{ business.telephoneHref }}">phone</a>.</p>
+</noscript>

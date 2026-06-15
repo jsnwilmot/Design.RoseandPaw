@@ -37,7 +37,7 @@ priority: 0.9
             <p class="contact-note">Based in Lethbridge, Alberta. Service area: Canada-wide.</p>
           </div>
 
-          <form action="https://api.web3forms.com/submit" method="POST" class="quote-form" data-contact-form data-captcha-form>
+          <form action="https://api.web3forms.com/submit" method="POST" class="quote-form" data-contact-form data-captcha-form aria-describedby="contact-captcha-status">
             <input type="hidden" name="access_key" value="225df1dc-443f-4d80-8162-1d63333d4bda">
             <input type="hidden" name="subject" value="New quote request from Rose & Paw Digital Designs website">
             <input type="hidden" name="from_name" value="Rose & Paw Digital Designs Website">
@@ -71,7 +71,8 @@ priority: 0.9
               </label>
             </div>
             <label>Message <textarea name="message" rows="6" required></textarea></label>
-            <div class="h-captcha" data-captcha="true"></div>
+            {% set captchaId = "contact-captcha" %}
+            {% include "partials/captcha.njk" %}
             <p class="form-status" data-form-status aria-live="polite" tabindex="-1"></p>
             <button class="button button-primary" type="submit">Request a Free Consultation</button>
           </form>

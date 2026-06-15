@@ -4,6 +4,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("script.js");
   eleventyConfig.addPassthroughCopy("audit.js");
   eleventyConfig.addPassthroughCopy("audit-client-utils.mjs");
+  eleventyConfig.addPassthroughCopy("captcha-loader.mjs");
   eleventyConfig.addPassthroughCopy("robots.txt");
   eleventyConfig.addPassthroughCopy("CNAME");
 
