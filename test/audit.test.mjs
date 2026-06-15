@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { buildAuditContactFields, getAuditErrorMessage, getScoreStatus } from "../audit-client-utils.mjs";
 import { handleAuditRequest } from "../worker/index.mjs";
 import { normalizePageSpeedResponse } from "../worker/pagespeed.mjs";
@@ -25,27 +26,62 @@ const samplePayload = () => ({
 
 const makeCache = () => {
   const values = new Map();
+  let putCalls = 0;
+  let matchCalls = 0;
   return {
+    values,
+    get matchCalls() {
+      return matchCalls;
+    },
+    get putCalls() {
+      return putCalls;
+    },
     async match(request) {
+      matchCalls += 1;
       return values.get(request.url)?.clone();
     },
     async put(request, response) {
+      putCalls += 1;
       values.set(request.url, response.clone());
     }
   };
 };
 
-const makeEnv = (rateLimitSuccess = true) => ({
+const makeEnv = (rateLimitSuccess = true, onRateLimit = () => {}) => ({
   PAGESPEED_API_KEY: "test-pagespeed-key",
-  ALLOWED_ORIGIN: "https://design.roseandpaw.ca",
+  ALLOWED_ORIGINS: "https://design.roseandpaw.ca,http://localhost:8080,http://127.0.0.1:8080",
   CACHE_TTL_SECONDS: "1800",
-  AUDIT_RATE_LIMITER: { limit: async () => ({ success: rateLimitSuccess }) }
+  AUDIT_RATE_LIMITER: {
+    limit: async (options) => {
+      onRateLimit(options);
+      return { success: rateLimitSuccess };
+    }
+  }
 });
 
-const makeRequest = (body, headers = {}) => new Request("https://design.roseandpaw.ca/api/website-audit", {
-  method: "POST",
-  headers: { "content-type": "application/json", origin: "https://design.roseandpaw.ca", "cf-connecting-ip": "203.0.113.10", ...headers },
-  body: JSON.stringify(body)
+const makeRequest = (body, headers = {}, options = {}) => {
+  const method = options.method || "POST";
+  const requestHeaders = { "content-type": "application/json", origin: "https://design.roseandpaw.ca", "cf-connecting-ip": "203.0.113.10", ...headers };
+  for (const [name, value] of Object.entries(requestHeaders)) {
+    if (value === undefined) delete requestHeaders[name];
+  }
+  return new Request(options.url || "https://design.roseandpaw.ca/api/website-audit", {
+    method,
+    headers: requestHeaders,
+    ...(method === "GET" || method === "HEAD" || method === "OPTIONS"
+      ? {}
+      : { body: options.rawBody ?? JSON.stringify(body) })
+  });
+};
+
+const makeDependencies = (overrides = {}) => ({
+  cache: makeCache(),
+  activeAudits: new Map(),
+  fetcher: async () => new Response(JSON.stringify(samplePayload()), {
+    status: 200,
+    headers: { "content-type": "application/json" }
+  }),
+  ...overrides
 });
 
 const makeContext = () => {
@@ -61,6 +97,8 @@ const makeContext = () => {
 test("normalizes a public URL and adds https when missing", () => {
   assert.equal(normalizePublicUrl("example.com"), "https://example.com/");
   assert.equal(normalizePublicUrl("HTTP://Example.com/path#section"), "http://example.com/path");
+  assert.equal(normalizePublicUrl("HTTPS://Example.com:443/path?view=full#section"), "https://example.com/path?view=full");
+  assert.equal(normalizePublicUrl("https://bücher.example/"), "https://xn--bcher-kva.example/");
 });
 
 for (const [label, url, code] of [
@@ -115,6 +153,8 @@ test("client helpers provide statuses, safe errors, and concise contact fields",
   assert.equal(getScoreStatus(90), "Strong");
   assert.equal(getScoreStatus(69), "Significant issues");
   assert.match(getAuditErrorMessage("rate_limited"), /Too many audits/);
+  assert.match(getAuditErrorMessage("missing_url"), /public website URL/);
+  assert.match(getAuditErrorMessage("payload_too_large"), /too large/);
   const report = normalizePageSpeedResponse(samplePayload(), "https://example.com/", "mobile", "2026-06-13T12:00:00.000Z");
   const fields = buildAuditContactFields(report);
   assert.equal(fields.website_url, "https://example.com/");
@@ -123,59 +163,194 @@ test("client helpers provide statuses, safe errors, and concise contact fields",
 
 test("endpoint returns normalized response and caches successful audits", async () => {
   const cache = makeCache();
+  const activeAudits = new Map();
   let pagespeedCalls = 0;
+  let rateLimitCalls = 0;
   const fetcher = async (url) => {
     pagespeedCalls += 1;
     assert.match(String(url), /pagespeedonline/);
+    assert.match(String(url), /key=test-pagespeed-key/);
     return new Response(JSON.stringify(samplePayload()), { status: 200, headers: { "content-type": "application/json" } });
   };
   const firstContext = makeContext();
-  const first = await handleAuditRequest(makeRequest({ url: "example.com", strategy: "mobile" }), makeEnv(), firstContext, { cache, fetcher });
+  const first = await handleAuditRequest(makeRequest({ url: "example.com", strategy: "mobile" }), makeEnv(true, () => { rateLimitCalls += 1; }), firstContext, { cache, fetcher, activeAudits });
   await Promise.all(firstContext.promises);
   assert.equal(first.status, 200);
   assert.equal((await first.json()).cached, false);
+  assert.equal(cache.putCalls, 1);
 
-  const second = await handleAuditRequest(makeRequest({ url: "example.com", strategy: "mobile" }), makeEnv(false), makeContext(), { cache, fetcher });
+  const second = await handleAuditRequest(makeRequest({ url: "example.com", strategy: "mobile" }), makeEnv(false, () => { rateLimitCalls += 1; }), makeContext(), { cache, fetcher, activeAudits });
   assert.equal(second.status, 200);
   assert.equal((await second.json()).cached, true);
   assert.equal(pagespeedCalls, 1);
+  assert.equal(rateLimitCalls, 1);
+  assert.equal(activeAudits.size, 0);
 });
 
 test("endpoint returns 429 for a new audit over the rate limit", async () => {
-  const response = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(false), makeContext(), { cache: makeCache(), fetcher: async () => assert.fail("PageSpeed must not be called") });
+  const response = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(false), makeContext(), makeDependencies({
+    fetcher: async () => assert.fail("PageSpeed must not be called")
+  }));
   assert.equal(response.status, 429);
   assert.deepEqual(await response.json(), { error: "rate_limited" });
+  assert.equal(response.headers.get("retry-after"), "60");
 });
 
-test("endpoint rejects invalid content type, oversized bodies, foreign origins, and honeypot submissions", async () => {
-  const env = makeEnv();
-  const dependencies = { cache: makeCache(), fetcher: async () => assert.fail("PageSpeed must not be called") };
-  const invalidType = await handleAuditRequest(makeRequest({ url: "example.com" }, { "content-type": "text/plain" }), env, makeContext(), dependencies);
-  assert.equal(invalidType.status, 400);
-  const oversized = await handleAuditRequest(makeRequest({ url: `https://example.com/${"x".repeat(5000)}` }), env, makeContext(), dependencies);
-  assert.equal(oversized.status, 400);
-  const foreign = await handleAuditRequest(makeRequest({ url: "example.com" }, { origin: "https://attacker.example" }), env, makeContext(), dependencies);
+test("cached reports remain available before configuration checks", async () => {
+  const dependencies = makeDependencies();
+  const generated = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(), makeContext(), dependencies);
+  assert.equal(generated.status, 200);
+
+  const cached = await handleAuditRequest(makeRequest({ url: "example.com" }), { ALLOWED_ORIGINS: "https://design.roseandpaw.ca" }, makeContext(), dependencies);
+  assert.equal(cached.status, 200);
+  assert.equal(cached.headers.get("x-audit-cache"), "HIT");
+
+  const uncached = await handleAuditRequest(makeRequest({ url: "example.org" }), { ALLOWED_ORIGINS: "https://design.roseandpaw.ca" }, makeContext(), dependencies);
+  assert.equal(uncached.status, 503);
+  assert.deepEqual(await uncached.json(), { error: "service_not_configured" });
+});
+
+test("endpoint applies the configured Origin allowlist and safe CORS headers", async () => {
+  const dependencies = makeDependencies();
+  const production = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(), makeContext(), dependencies);
+  assert.equal(production.status, 200);
+  assert.equal(production.headers.get("access-control-allow-origin"), "https://design.roseandpaw.ca");
+  assert.equal(production.headers.get("vary"), "Origin");
+
+  const development = await handleAuditRequest(makeRequest({ url: "example.org" }, { origin: "http://localhost:8080" }), makeEnv(), makeContext(), dependencies);
+  assert.equal(development.status, 200);
+  assert.equal(development.headers.get("access-control-allow-origin"), "http://localhost:8080");
+
+  const foreign = await handleAuditRequest(makeRequest({ url: "example.net" }, { origin: "https://attacker.example" }), makeEnv(), makeContext(), dependencies);
   assert.equal(foreign.status, 403);
+  assert.deepEqual(await foreign.json(), { error: "forbidden_origin" });
+  assert.equal(foreign.headers.get("access-control-allow-origin"), null);
+});
+
+test("missing Origin requests receive normal validation and abuse controls", async () => {
+  let rateLimitCalls = 0;
+  const response = await handleAuditRequest(makeRequest({ url: "example.com" }, { origin: undefined }), makeEnv(true, () => { rateLimitCalls += 1; }), makeContext(), makeDependencies());
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("access-control-allow-origin"), null);
+  assert.equal(rateLimitCalls, 1);
+});
+
+test("OPTIONS and invalid methods return safe method and CORS behavior", async () => {
+  const options = await handleAuditRequest(makeRequest(null, { origin: "http://127.0.0.1:8080" }, { method: "OPTIONS" }), makeEnv(), makeContext(), makeDependencies());
+  assert.equal(options.status, 204);
+  assert.equal(options.headers.get("access-control-allow-origin"), "http://127.0.0.1:8080");
+  assert.equal(options.headers.get("access-control-allow-methods"), "POST, OPTIONS");
+
+  const invalidMethod = await handleAuditRequest(makeRequest(null, {}, { method: "GET" }), makeEnv(), makeContext(), makeDependencies());
+  assert.equal(invalidMethod.status, 405);
+  assert.deepEqual(await invalidMethod.json(), { error: "method_not_allowed" });
+  assert.equal(invalidMethod.headers.get("allow"), "POST, OPTIONS");
+});
+
+test("endpoint returns precise safe request-validation errors before upstream work", async () => {
+  const env = makeEnv();
+  const dependencies = makeDependencies({ fetcher: async () => assert.fail("PageSpeed must not be called") });
+  const invalidType = await handleAuditRequest(makeRequest({ url: "example.com" }, { "content-type": "text/plain" }), env, makeContext(), dependencies);
+  assert.equal(invalidType.status, 415);
+  assert.deepEqual(await invalidType.json(), { error: "invalid_content_type" });
+  const oversized = await handleAuditRequest(makeRequest({ url: `https://example.com/${"x".repeat(5000)}` }), env, makeContext(), dependencies);
+  assert.equal(oversized.status, 413);
+  assert.deepEqual(await oversized.json(), { error: "payload_too_large" });
+  const invalidJson = await handleAuditRequest(makeRequest(null, {}, { rawBody: "{" }), env, makeContext(), dependencies);
+  assert.equal(invalidJson.status, 400);
+  assert.deepEqual(await invalidJson.json(), { error: "invalid_json" });
+  const missingUrl = await handleAuditRequest(makeRequest({ strategy: "mobile" }), env, makeContext(), dependencies);
+  assert.deepEqual(await missingUrl.json(), { error: "missing_url" });
   const honeypot = await handleAuditRequest(makeRequest({ url: "example.com", company_website: "filled" }), env, makeContext(), dependencies);
-  assert.equal(honeypot.status, 400);
+  assert.deepEqual(await honeypot.json(), { error: "invalid_request" });
+  const privateUrl = await handleAuditRequest(makeRequest({ url: "http://127.0.0.1" }), env, makeContext(), dependencies);
+  assert.deepEqual(await privateUrl.json(), { error: "private_url" });
+  const credentials = await handleAuditRequest(makeRequest({ url: "https://user:pass@example.com" }), env, makeContext(), dependencies);
+  assert.deepEqual(await credentials.json(), { error: "embedded_credentials" });
+  assert.equal(dependencies.cache.matchCalls, 0);
 });
 
 test("endpoint returns safe PageSpeed failure response", async () => {
-  const response = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(), makeContext(), {
-    cache: makeCache(),
+  const dependencies = makeDependencies({
     fetcher: async () => new Response("quota details and internal data", { status: 429 })
   });
+  const response = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(), makeContext(), dependencies);
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), { error: "pagespeed_rate_limited" });
+  assert.equal(dependencies.cache.putCalls, 0);
+  assert.equal(dependencies.activeAudits.size, 0);
 });
 
 test("endpoint returns safe timeout response", async () => {
   const timeout = new Error("timed out");
   timeout.name = "TimeoutError";
-  const response = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(), makeContext(), {
-    cache: makeCache(),
+  const dependencies = makeDependencies({
     fetcher: async () => { throw timeout; }
   });
+  const response = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(), makeContext(), dependencies);
   assert.equal(response.status, 504);
   assert.deepEqual(await response.json(), { error: "pagespeed_timeout" });
+  assert.equal(dependencies.activeAudits.size, 0);
+});
+
+test("concurrent identical requests share one active PageSpeed request", async () => {
+  let resolveUpstream;
+  let signalUpstreamStarted;
+  const upstreamStarted = new Promise((resolve) => { signalUpstreamStarted = resolve; });
+  let pagespeedCalls = 0;
+  let rateLimitCalls = 0;
+  const dependencies = makeDependencies({
+    fetcher: async () => {
+      pagespeedCalls += 1;
+      signalUpstreamStarted();
+      await new Promise((resolve) => { resolveUpstream = resolve; });
+      return new Response(JSON.stringify(samplePayload()), { status: 200 });
+    }
+  });
+  const env = makeEnv(true, () => { rateLimitCalls += 1; });
+  const firstPromise = handleAuditRequest(makeRequest({ url: "example.com" }), env, makeContext(), dependencies);
+  const secondPromise = handleAuditRequest(makeRequest({ url: "https://EXAMPLE.com:443/" }), env, makeContext(), dependencies);
+  await upstreamStarted;
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  resolveUpstream();
+
+  const [first, second] = await Promise.all([firstPromise, secondPromise]);
+  assert.equal(first.status, 200);
+  assert.equal(second.status, 200);
+  assert.equal(second.headers.get("x-audit-cache"), "COALESCED");
+  assert.equal(pagespeedCalls, 1);
+  assert.equal(rateLimitCalls, 1);
+  assert.equal(dependencies.activeAudits.size, 0);
+});
+
+test("upstream failures are not cached, are safely normalized, and permit later retry", async () => {
+  let pagespeedCalls = 0;
+  const dependencies = makeDependencies({
+    fetcher: async () => {
+      pagespeedCalls += 1;
+      if (pagespeedCalls === 1) return new Response("private upstream details", { status: 500 });
+      return new Response(JSON.stringify(samplePayload()), { status: 200 });
+    }
+  });
+
+  const failed = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(), makeContext(), dependencies);
+  assert.equal(failed.status, 502);
+  assert.deepEqual(await failed.json(), { error: "pagespeed_failed" });
+  assert.equal(dependencies.cache.putCalls, 0);
+  assert.equal(dependencies.activeAudits.size, 0);
+
+  const retried = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(), makeContext(), dependencies);
+  assert.equal(retried.status, 200);
+  assert.equal(pagespeedCalls, 2);
+  assert.equal(dependencies.cache.putCalls, 1);
+});
+
+test("responses never expose the PageSpeed API key or raw upstream details", async () => {
+  const response = await handleAuditRequest(makeRequest({ url: "example.com" }), makeEnv(), makeContext(), makeDependencies({
+    fetcher: async () => new Response(`failed request key=${makeEnv().PAGESPEED_API_KEY}`, { status: 500 })
+  }));
+  const text = await response.text();
+  assert.equal(response.status, 502);
+  assert.doesNotMatch(text, /test-pagespeed-key|failed request|googleapis/i);
+  assert.doesNotMatch(readFileSync(new URL("../worker/index.mjs", import.meta.url), "utf8"), /console\.(?:log|warn|error)/);
 });

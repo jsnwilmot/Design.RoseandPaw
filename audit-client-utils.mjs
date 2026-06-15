@@ -15,6 +15,10 @@ export const getAuditErrorMessage = (code) => ({
   pagespeed_rate_limited: "Google PageSpeed Insights is temporarily busy. Please try again later.",
   pagespeed_failed: "Google PageSpeed Insights could not audit this page. Confirm it is publicly available and try again.",
   service_not_configured: "The audit service is not configured yet. Please use the contact page for help.",
+  missing_url: "Enter a public website URL to audit.",
+  invalid_content_type: "The audit request could not be processed. Refresh the page and try again.",
+  payload_too_large: "The audit request was too large. Shorten the website URL and try again.",
+  invalid_json: "The audit request could not be processed. Refresh the page and try again.",
   invalid_request: "The audit request could not be processed. Check the website URL and try again."
 }[code] || "The audit could not be completed. Please try again or contact Rose & Paw Digital Designs.");
 

@@ -106,14 +106,18 @@ Google Analytics 4 uses the Measurement ID in `src/_data/business.json` and load
 
 The API:
 
-- accepts only same-origin JSON `POST` requests up to 4 KiB
+- accepts JSON `POST` requests up to 4 KiB and rejects browser requests from origins outside the configured allowlist
 - normalizes domains without a protocol to HTTPS
 - rejects localhost, embedded credentials, malformed hosts, private/loopback/link-local IPv4 and IPv6 ranges, unsupported protocols, control characters, and excessive URL lengths
 - never downloads or renders the submitted page directly
-- rate-limits new reports by connecting IP through a Cloudflare Workers Rate Limiting binding
+- returns valid cached reports before rate limiting or generating a new report
+- rate-limits uncached reports by connecting IP through a Cloudflare Workers Rate Limiting binding
+- suppresses concurrent duplicate PageSpeed requests for the same normalized URL and strategy within each Worker isolate
 - caches successful reports by normalized URL and strategy for 30 minutes using the Workers Cache API
 - applies a 60-second PageSpeed request timeout and returns safe error codes
 - keeps the PageSpeed API key in a Cloudflare secret
+
+Origin validation reduces browser-based cross-origin abuse but is not authentication. Requests without an `Origin` header still receive all normal validation, cache, honeypot, and rate-limit controls because non-browser callers can omit or spoof that header. Allowed browser origins receive explicit CORS headers; arbitrary origins are never reflected. Public callers never receive the Google PageSpeed API key.
 
 The request-for-help form uses the existing Web3Forms access-key pattern and free-plan hCaptcha integration. It sends a concise audit summary, not raw Lighthouse JSON.
 
@@ -131,9 +135,19 @@ For local Worker API development, copy `.dev.vars.example` to `.dev.vars` and re
 npx wrangler dev
 ```
 
-`ALLOWED_ORIGIN`, the 30-minute cache TTL, route, and rate-limit binding are non-secret values in `wrangler.jsonc`. Do not add PageSpeed keys to Eleventy data, browser JavaScript, generated files, or GitHub variables.
+`ALLOWED_ORIGINS`, the 30-minute cache TTL, route, and rate-limit binding are non-secret values in `wrangler.jsonc`. The allowlist contains the production site and the existing local Eleventy development origins. Do not add PageSpeed keys to Eleventy data, browser JavaScript, generated files, or GitHub variables.
 
 The existing hCaptcha integration does not require a repository environment variable. Keep hCaptcha selected for the website-audit help form in the Web3Forms dashboard.
+
+### Optional Cloudflare Dashboard Protections
+
+These protections are dashboard actions and are not configured by this repository:
+
+- Add a route-specific Cloudflare rate-limiting rule for uncached `/api/website-audit` abuse where plan features permit.
+- Enable available free-plan bot protections and monitor false positives before tightening them.
+- Restrict the Google PageSpeed API key to the PageSpeed Insights API, set quota limits, and monitor usage.
+- Configure Cloudflare and Google Cloud usage alerts.
+- Monitor Worker cache-hit rates and unexpected audit-generation volume.
 
 ## SEO And Structured Data
 

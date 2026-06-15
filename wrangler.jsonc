@@ -20,7 +20,7 @@
     }
   ],
   "vars": {
-    "ALLOWED_ORIGIN": "https://design.roseandpaw.ca",
+    "ALLOWED_ORIGINS": "https://design.roseandpaw.ca,http://localhost:8080,http://127.0.0.1:8080",
     "CACHE_TTL_SECONDS": "1800"
   },
   "observability": {
