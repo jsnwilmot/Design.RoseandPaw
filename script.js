@@ -473,14 +473,14 @@ if (contactForm instanceof HTMLFormElement) {
 
 }
 
-const portfolioImages = document.querySelectorAll(".portfolio-preview img");
+const lightboxTriggers = document.querySelectorAll("[data-lightbox-trigger]");
 
-if (portfolioImages.length > 0) {
+if (lightboxTriggers.length > 0) {
   const lightbox = document.createElement("div");
   lightbox.className = "image-lightbox";
   lightbox.setAttribute("role", "dialog");
   lightbox.setAttribute("aria-modal", "true");
-  lightbox.setAttribute("aria-label", "Expanded portfolio image");
+  lightbox.setAttribute("aria-label", "Portfolio image preview");
   lightbox.hidden = true;
   lightbox.innerHTML = `
     <button class="image-lightbox-close" type="button" aria-label="Close image preview">Close</button>
@@ -489,57 +489,108 @@ if (portfolioImages.length > 0) {
 
   const lightboxImage = lightbox.querySelector("img");
   const closeButton = lightbox.querySelector("button");
-  let lastFocusedElement = null;
+  let activeTrigger = null;
+  let inertBackground = [];
 
-  const closeLightbox = () => {
-    lightbox.hidden = true;
-    document.body.classList.remove("has-lightbox");
+  const getFocusableElements = (container) => [...container.querySelectorAll(
+    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )].filter((element) => !element.hidden);
 
-    if (lastFocusedElement instanceof HTMLElement) {
-      lastFocusedElement.focus();
+  const restoreBackground = () => {
+    for (const { element, wasInert } of inertBackground) {
+      element.inert = wasInert;
+    }
+    inertBackground = [];
+  };
+
+  const makeBackgroundInert = () => {
+    inertBackground = [...document.body.children]
+      .filter((element) => element !== lightbox && element instanceof HTMLElement)
+      .map((element) => ({ element, wasInert: element.inert }));
+
+    for (const { element } of inertBackground) {
+      element.inert = true;
     }
   };
 
-  portfolioImages.forEach((image) => {
-    image.setAttribute("tabindex", "0");
-    image.setAttribute("role", "button");
-    image.setAttribute("aria-label", "Open larger portfolio image");
+  const trapLightboxFocus = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeLightbox();
+      return;
+    }
+    if (event.key !== "Tab") return;
 
-    const openLightbox = () => {
-      lastFocusedElement = document.activeElement;
+    const focusableElements = getFocusableElements(lightbox);
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements.at(-1);
+    if (!firstElement || !lastElement) {
+      event.preventDefault();
+      return;
+    }
 
-      if (lightboxImage instanceof HTMLImageElement) {
-        lightboxImage.src = image.currentSrc || image.src;
-        lightboxImage.alt = image.alt || "Expanded portfolio image";
-      }
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  };
 
-      lightbox.hidden = false;
-      document.body.classList.add("has-lightbox");
+  const keepFocusInLightbox = (event) => {
+    if (!lightbox.contains(event.target) && closeButton instanceof HTMLButtonElement) {
+      closeButton.focus();
+    }
+  };
 
-      if (closeButton instanceof HTMLButtonElement) {
-        closeButton.focus();
-      }
-    };
+  const closeLightbox = () => {
+    if (lightbox.hidden) return;
 
-    image.addEventListener("click", openLightbox);
-    image.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        openLightbox();
-      }
-    });
+    document.removeEventListener("keydown", trapLightboxFocus);
+    document.removeEventListener("focusin", keepFocusInLightbox);
+    restoreBackground();
+    lightbox.hidden = true;
+    document.body.classList.remove("has-lightbox");
+
+    if (lightboxImage instanceof HTMLImageElement) {
+      lightboxImage.removeAttribute("src");
+      lightboxImage.alt = "";
+    }
+
+    if (activeTrigger instanceof HTMLButtonElement && activeTrigger.isConnected) {
+      activeTrigger.focus();
+    }
+    activeTrigger = null;
+  };
+
+  const openLightbox = (trigger) => {
+    const image = trigger.querySelector("[data-lightbox-image]");
+    if (!(image instanceof HTMLImageElement) || !(lightboxImage instanceof HTMLImageElement)) return;
+
+    activeTrigger = trigger;
+    lightboxImage.src = image.currentSrc || image.src;
+    lightboxImage.alt = image.alt;
+    lightbox.hidden = false;
+    document.body.classList.add("has-lightbox");
+    makeBackgroundInert();
+    document.addEventListener("keydown", trapLightboxFocus);
+    document.addEventListener("focusin", keepFocusInLightbox);
+
+    if (closeButton instanceof HTMLButtonElement) {
+      closeButton.focus();
+    }
+  };
+
+  lightboxTriggers.forEach((trigger) => {
+    if (trigger instanceof HTMLButtonElement && trigger.querySelector("[data-lightbox-image]")) {
+      trigger.addEventListener("click", () => openLightbox(trigger));
+    }
   });
 
+  closeButton?.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", (event) => {
-    if (event.target === lightbox || event.target === closeButton) {
-      closeLightbox();
-    }
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !lightbox.hidden) {
-      closeLightbox();
-    }
+    if (event.target === lightbox) closeLightbox();
   });
 
   document.body.append(lightbox);
