@@ -118,10 +118,12 @@ const openCookieSettings = () => {
   document.body.classList.add("has-cookie-banner");
   document.body.append(banner);
 
-  const firstChoice = banner.querySelector("[data-cookie-choice]");
-  if (firstChoice instanceof HTMLButtonElement) {
-    firstChoice.focus({ preventScroll: true });
-  }
+  window.requestAnimationFrame(() => {
+    const firstChoice = banner.querySelector("[data-cookie-choice]");
+    if (firstChoice instanceof HTMLButtonElement) {
+      firstChoice.focus({ preventScroll: true });
+    }
+  });
 };
 
 const closeCookieSettings = () => {
@@ -281,7 +283,7 @@ if (reviewCarousel instanceof HTMLElement) {
   }, { passive: false });
 
   reviewCarousel.addEventListener("scroll", updateReviewControls, { passive: true });
-  window.addEventListener("resize", updateReviewControls);
+  window.addEventListener("resize", () => { window.requestAnimationFrame(updateReviewControls); });
   window.requestAnimationFrame(updateReviewControls);
 }
 
